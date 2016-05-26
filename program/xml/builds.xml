@@ -1,0 +1,49 @@
+<!--
+	Notes:
+	- Build IDs are used as the labels in "Start Selector" window.
+	- Odd Mushroom (thin) = 120
+	- Odd Mushroom (thick) = 121
+-->
+
+<builds>
+	<!-- Treasure Room starts -->
+	<build id="1" tag="treasure" weight="1" items="20/20" />
+	<build id="2" tag="treasure" weight="1" items="Chocolate Milk" />
+	<build id="3" tag="treasure" weight="1" items="Cricket's Body" />
+	<build id="4" tag="treasure" weight="1" items="Cricket's Head" />
+	<build id="5" tag="treasure" weight="1" items="Dead Eye" />
+	<build id="6" tag="treasure" weight="1" items="Death's Touch" />
+	<build id="7" tag="treasure" weight="1" items="Dr. Fetus" />
+	<build id="8" tag="treasure" weight="1" items="Epic Fetus" />
+	<build id="9" tag="treasure" weight="1" items="Ipecac" />
+	<build id="10" tag="treasure" weight="1" items="Judas' Shadow" />
+	<build id="11" tag="treasure" weight="1" items="Lil' Brimstone" />
+	<build id="12" tag="treasure" weight="1" items="Magic Mushroom" />
+	<build id="13" tag="treasure" weight="1" items="Mom's Knife" />
+	<build id="14" tag="treasure" weight="1" items="Monstro's Lung" />
+	<build id="15" tag="treasure" weight="1" items="Polyphemus" />
+	<build id="16" tag="treasure" weight="1" items="Proptosis" />
+	<build id="17" tag="treasure" weight="1" items="Sacrificial Dagger" />
+	<build id="18" tag="treasure" weight="1" items="Tech.5" />
+	<build id="19" tag="treasure" weight="1" items="Tech X" />
+
+	<!-- Devil Room starts -->
+	<build id="20" tag="devil" weight="1" items="Brimstone" />
+	<build id="21" tag="devil" weight="1" items="Incubus" />
+	<build id="22" tag="devil" weight="1" items="Maw of the Void" />
+
+	<!-- Angel Room starts -->
+	<build id="23" tag="angel" weight="1" items="Crown of Light" />
+	<build id="24" tag="angel" weight="1" items="Godhead" />
+	<build id="25" tag="angel" weight="1" items="Sacred Heart" />
+
+	<!-- Custom starts with the D6 -->
+	<build id="26" tag="custom" weight="1" items="Mutant Spider + The Inner Eye" />
+	<build id="27" tag="custom" weight="1" items="Technology + A Lump of Coal" />
+	<build id="28" tag="custom" weight="1" items="The Ludovico Technique + The Parasite" />
+	<build id="29" tag="custom" weight="1" items="Fire Mind + Lucky Foot + Lucky Foot + Lucky Foot + Lucky Foot + Lucky Foot + Lucky Foot + Lucky Foot + Lucky Foot + Lucky Foot + Lucky Foot + Lucky Foot + Lucky Foot + Lucky Foot" /> <!-- 13 luck -->
+
+	<!-- Custom starts without the D6 -->
+	<build id="30" tag="custom" weight="1" items="Kamikaze! + Host Hat" />
+	<build id="31" tag="custom" weight="1" items="Mega Blast + Habit + The Battery" trinket="AAA Battery" />
+</builds>
