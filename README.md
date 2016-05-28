@@ -12,7 +12,7 @@
 ## What Is It?
 
 This is a program that contains the 3 racing mods:
-* The [Jud6s Mod](https://github.com/Zamiell/jud6s)
+* [The Jud6s Mod](https://github.com/Zamiell/jud6s)
 * [Instant Start Mod](https://github.com/Zamiell/isaac-racing-mods/README-instant-start-mod.md)
 * [Diversity Mod](https://github.com/Zamiell/isaac-racing-mods/README-diversity-mod.md)
 
