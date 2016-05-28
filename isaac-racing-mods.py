@@ -1,6 +1,7 @@
 #! C:\Python35\python.exe
 
 # Imports
+import sys                 # For quitting the application
 import traceback           # For error handling
 import logging             # For logging all exceptions to a file
 import tkinter             # We use TKinter to draw the GUI
@@ -39,7 +40,7 @@ def error(message, exception):
     tkinter.messagebox.showerror('Error', message)
 
     # Exit the program immediately
-    exit()
+    sys.exit()
 
 
 def warning(message, exception):
@@ -71,7 +72,7 @@ def callback_error(self, *args):
     tkinter.messagebox.showerror('Error', message)
 
     # Exit the program immediately
-    exit()
+    sys.exit()
 
 
 ##############################
@@ -110,7 +111,7 @@ def make_directory(path):
 
 def hyperlink_button_function():
     webbrowser.open_new(r'https://github.com/Zamiell/' + mod_name + '/releases')
-    exit()
+    sys.exit()
 
 
 def update_button_function():
@@ -202,7 +203,7 @@ def main():
     root.iconbitmap('images/the_d6.ico')  # Set the GUI icon
     root.title(mod_pretty_name)  # Set the GUI title
     root.resizable(False, False)
-    root.protocol('WM_DELETE_WINDOW', exit)
+    root.protocol('WM_DELETE_WINDOW', sys.exit)
 
     # Validate that options.ini exists and contains the values we need
     if not os.path.isfile('options.ini'):
@@ -250,7 +251,16 @@ def main():
         i_dont_care_button = tkinter.Button(root, font='font 12', text='I don\'t care', command=root.quit)
         i_dont_care_button.grid(row=2, pady=10)
 
+        # Place the window in the center of the screen
         root.deiconify()  # Show the GUI
+        root.update_idletasks()  # Update the GUI
+        window_width = root.winfo_width()
+        window_height = root.winfo_height()
+        screen_width = root.winfo_screenwidth()
+        screen_height = root.winfo_screenheight()
+        x = (screen_width / 2) - (window_width / 2)
+        y = (screen_height / 2) - (window_height / 2)
+        root.geometry('%dx%d+%d+%d' % (window_width, window_height, x, y))
         tkinter.mainloop()  # Run in an infinite loop
 
         # The user gave a response
@@ -269,7 +279,16 @@ def main():
 
         updating_message = tkinter.Message(root, justify=tkinter.CENTER, font='font 16', text='Updating...', width=600)
 
+        # Place the window in the center of the screen
         root.deiconify()  # Show the GUI
+        root.update_idletasks()  # Update the GUI
+        window_width = root.winfo_width()
+        window_height = root.winfo_height()
+        screen_width = root.winfo_screenwidth()
+        screen_height = root.winfo_screenheight()
+        x = (screen_width / 2) - (window_width / 2)
+        y = (screen_height / 2) - (window_height / 2)
+        root.geometry('%dx%d+%d+%d' % (window_width, window_height, x, y))
         tkinter.mainloop()  # Run in an infinite loop
 
         # The user gave a response, so proceed with launching the main program
@@ -285,7 +304,7 @@ def main():
 
     # Open the main program
     subprocess.Popen([os.path.join(mod_version, 'program.exe')], cwd=mod_version)
-    exit()
+    sys.exit()
 
 
 ######################

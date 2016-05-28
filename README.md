@@ -28,7 +28,7 @@ Run the `isaac-racing-mods` program. You do not have to move any files or uninst
 
 ## What Exactly Does the Program Do Behind the Scenes?
 
-* When the program is started, any important files in your "resources" directory is backed up to "resources_tmp##########" (a directory name corresponding to the current time).
+* When the program is started, any important files in your "resources" directory are backed up to "resources_tmp##########" (a directory name corresponding to the current time).
 * Once you select the mod you want to play, it moves files into your "resources" directory and automatically starts Isaac.
 * When closed, the program will put everything in your "resources" directory back to the way it was.
 
@@ -45,7 +45,7 @@ Run the `isaac-racing-mods` program. You do not have to move any files or uninst
 ## Version History
 
 * *3.0.0* - May 28th, 2016
-  * This is the first version of the combined mod package. It starts at version 3.0.0 to signify that it is a later version of v2.3.3, the final standalone release of Diversity Mod.
+  * This is the first version of the combined mod package. It starts at version 3.0.0 to signify that it is a subsequent version of v2.3.3, the final standalone release of Diversity Mod.
   * The standalone versions of Instant Start Mod and Diversity Mod will no longer be maintained. For now, the standalone version of Jud6s will continue to be maintained alongside this one.
   * The Isaac Racing Mods will now automatically update if there is a new version (provided that you click the "Automatically update and launch the new version" button).
   * A new spiffy Jud6s launcher is added to the mod package.

@@ -1,13 +1,14 @@
 #! C:\Python35\python.exe
 
+####################
+# Isaac Racing Mods
+####################
+
 # TODO
 # - build.py
 
-# Notes:
-# - D: && cd D:\Repositories\isaac-racing-mods\program
-# - pep8 --first --ignore=E501 program.py
-
 # Imports
+import sys                    # For quitting the application
 import traceback              # For error handling
 import logging                # For logging all exceptions to a file
 import tkinter                # We use TKinter to draw the GUI
@@ -52,7 +53,7 @@ def error(message, exception):
     tkinter.messagebox.showerror('Error', message)
 
     # Exit the program immediately
-    exit()
+    sys.exit()
 
 
 def warning(message, exception):
@@ -84,7 +85,7 @@ def callback_error(self, *args):
     tkinter.messagebox.showerror('Error', message)
 
     # Exit the program immediately
-    exit()
+    sys.exit()
 
 
 ##############################
@@ -174,7 +175,7 @@ def set_custom_path():
         subprocess.Popen(['program.exe'])
     except Exception as e:
         error(mod_pretty_name + ' was not able to automatically restart itself. Please re-run it manually.', e)
-    exit()
+    sys.exit()
 
 
 ##########################
@@ -1625,15 +1626,15 @@ class DiversityWindow():
 
         # Remove the "special" status from all items (done in the Diversity mod)
         for item in items_info:
-            if 'special' in item.attrib.values():
-                del(item.attrib['special'])
+            if 'special' in item.attrib.keys():
+                del item.attrib['special']
 
         # Add the 3 random items to every character
         characters_to_skip = ['Eden', 'Lazarus II', 'Black Judas', 'Keeper']  # The game crashes if you try to give Keeper items
         for character in players_info:
             if character.attrib['name'] in characters_to_skip:
                 continue
-            character.attrib['items'] += ',' + str(shuffed_items[0]) + ',' + str(shuffed_items[1]) + ',' + str(shuffed_items[2])
+            character.attrib['items'] += ',' + get_item_id(items[0]) + ',' + get_item_id(items[1]) + ',' + get_item_id(items[2])
 
         # Define the item bans
         removed_items = []
@@ -1803,7 +1804,7 @@ def uninstall_mod():
         delete_file_if_exists(temp_directory)
 
     # Exit the program
-    exit()
+    sys.exit()
 
 
 ################

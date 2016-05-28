@@ -1,48 +1,73 @@
-#! C:\Python34\python.exe
+#! C:\Python35\python.exe
 
-#------------------------------------------------------------------------------------
-# build.py
-# - This file will compile the Python code into an EXE and then into a neat ZIP file.
-#------------------------------------------------------------------------------------
-
-# Configuration
-version = '1.6.8'
-install_name = 'instant-start-mod-' + version
+# Notes:
+# - This file will "freeze" the Python code into an EXE and then package it into a ZIP file.
 
 # Imports
-import os                                   # For various file operations (1/2)
-import shutil                               # For various file operations (2/2)
-import sys                                  # To exit on error
-import subprocess                           # To call pyinstaller
-from PIL import Image, ImageFont, ImageDraw # For drawing the title screen
+import os            # For various file operations (1/2)
+import shutil        # For various file operations (2/2)
+import subprocess    # To call pyinstaller
+import configparser  # For parsing options.ini
+
+# Configuration
+mod_pretty_name = 'Isaac Racing Mods'
+mod_name = 'isaac-racing-mods'
+pyinstaller_path = 'C:\Python35\Scripts\pyinstaller.exe'
+
+# Get the version number of the mod from options.ini
+mod_options = configparser.ConfigParser()
+mod_options.read('options.ini')
+mod_version = mod_options['options']['modversion']
+
+# Define the installation directory
+install_name = mod_name + '-' + mod_version
 
 # Clean up build-related directories before we start to do anything
 if os.path.exists('build'):
 	shutil.rmtree('build')
 if os.path.exists('dist'):
 	shutil.rmtree('dist')
+if os.path.exists('__pycache__'):
+    shutil.rmtree('__pycache__')
+if os.path.exists('program/__pycache__'):
+    shutil.rmtree('program/__pycache__')
 if os.path.exists('release'):
 	shutil.rmtree('release')
 
-# Compile the py file into an exe
-if os.path.exists('C:\Python34\Scripts\pyinstaller.exe'):
-    subprocess.call(['C:\Python34\Scripts\pyinstaller.exe', '--onefile', '--windowed', '--icon=images/options.ico', 'instant-start-mod.py'])
-else:
+# Freeze the updater and the main program into an exe
+if not os.path.isfile(pyinstaller_path):
     print('Error: Edit this file and specify the path to your pyinstaller.exe file.')
-    sys.exit(1)
+    exit(1)
+subprocess.call([pyinstaller_path, '--onefile', '--windowed', '--icon=images/the_d6.ico', 'isaac-racing-mods.py'])
+subprocess.call([pyinstaller_path, '--onefile', '--windowed', '--icon=images/the_d6.ico', 'program/program.py'])
+
+# Clean up
+shutil.rmtree('__pycache__')
+shutil.rmtree('program/__pycache__')
 
 # Make the installation directory inside the "release" directory
 install_directory = os.path.join('release', install_name)
-shutil.copytree('dist/', install_directory)
+shutil.copytree('dist', install_directory)
 
 # Copy over necessary files
-for file_name in ['README.md', 'options.ini', 'Shortcut to BoIA Resources Folder.lnk']:
+for file_name in ['options.ini', 'README.md', 'README-diversity-mod.md', 'README-instant-start-mod.md', 'Shortcut to BoIA Resources Folder.lnk']:
 	shutil.copy(file_name, os.path.join(install_directory, file_name))
-for directory_name in ['fonts', 'images', 'jud6s', 'other-files', 'seeded', 'xml']:
+for directory_name in ['images', 'program']:
 	shutil.copytree(directory_name, os.path.join(install_directory, directory_name))
+
+# Remove "program.py"
+os.unlink(os.path.join(install_directory, 'program/program.py'))
+
+# Move "program.exe" to the "program" directory
+shutil.move(os.path.join(install_directory, 'program.exe'), os.path.join(install_directory, 'program/program.exe'))
+
+# Rename the "program" directory to the version number of the mod
+shutil.move(os.path.join(install_directory, 'program'), os.path.join(install_directory, mod_version))
 
 # Rename README.md to README.txt extension so that noobs are less confused
 shutil.move(os.path.join(install_directory, 'README.md'), os.path.join(install_directory, 'README.txt'))
+shutil.move(os.path.join(install_directory, 'README-diversity-mod.md'), os.path.join(install_directory, 'README-diversity-mod.txt'))
+shutil.move(os.path.join(install_directory, 'README-instant-start-mod.md'), os.path.join(install_directory, 'README-instant-start-mod.txt'))
 
 # Make the zip file
 shutil.make_archive(os.path.join('release', install_name), 'zip', 'release', install_name + '/')
@@ -50,4 +75,5 @@ shutil.make_archive(os.path.join('release', install_name), 'zip', 'release', ins
 # Clean up
 shutil.rmtree('build')
 shutil.rmtree('dist')
-os.unlink('instant-start-mod.spec')
+os.unlink('isaac-racing-mods.spec')
+os.unlink('program.spec')
