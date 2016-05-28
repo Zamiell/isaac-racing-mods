@@ -4,9 +4,6 @@
 # Isaac Racing Mods
 ####################
 
-# TODO
-# - build.py
-
 # Imports
 import sys                    # For quitting the application
 import traceback              # For error handling
@@ -1821,6 +1818,7 @@ def main():
     root.iconbitmap('images/icons/the_d6.ico')  # Set the GUI icon
     root.title(mod_pretty_name)  # Set the GUI title
     root.resizable(False, False)
+    root.protocol('WM_DELETE_WINDOW', sys.exit)
 
     # Validate that options.ini exists and contains the values we need
     if not os.path.isfile(os.path.join('..', 'options.ini')):

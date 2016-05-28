@@ -105,95 +105,187 @@ def make_directory(path):
         error('Failed to create the "' + path + '" directory:', e)
 
 
-###################
-# Update functions
-###################
+####################################
+# The classes for the popup windows
+####################################
 
-def hyperlink_button_function():
-    webbrowser.open_new(r'https://github.com/Zamiell/' + mod_name + '/releases')
-    sys.exit()
+class NewUpdaterVersion():
+    def __init__(self, parent):
+        # Initialize a new GUI window
+        self.parent = parent
+        self.window = tkinter.Toplevel(self.parent)
+        self.window.withdraw()  # Hide the GUI
+        self.window.title(mod_pretty_name + ' v' + mod_version)  # Set the GUI title
+        self.window.iconbitmap('images/the_d6.ico')  # Set the GUI icon
+        self.window.resizable(False, False)
+        self.window.protocol('WM_DELETE_WINDOW', sys.exit)
 
+        new_updater_version_message = tkinter.Message(self.window, justify=tkinter.CENTER, font='font 10', text='A new version of ' + mod_pretty_name + ' has been released.\nUnfortunately, this version cannot be automatically updated.\n(You are currently running version ' + mod_version + '.)', width=600)
+        new_updater_version_message.grid(row=0, pady=10)
 
-def update_button_function():
-    # Update the GUI to show that we are updating
-    new_version_message.grid_remove()
-    root.update_idletasks()
-    update_button.grid_remove()
-    old_version_button.grid_remove()
-    updating_message.grid(row=0, pady=10)
-    root.update_idletasks()
+        hyperlink_button = tkinter.Button(self.window, font='font 12', text='Download the latest version')
+        hyperlink_button.configure(command=self.hyperlink_button_function)
+        hyperlink_button.grid(row=1, pady=10)
 
-    # Check to see if the zip file already exists
-    delete_file_if_exists(mod_name + '.zip')
+        i_dont_care_button = tkinter.Button(self.window, font='font 12', text='I don\'t care', command=parent.quit)
+        i_dont_care_button.grid(row=2, pady=10)
 
-    # Download the zip file
-    try:
-        url = 'https://github.com/Zamiell/' + mod_name + '/releases/download/' + latest_version + '/' + mod_name + '.zip'
-        urllib.request.urlretrieve(url, mod_name + '.zip')
-    except Exception as e:
-        error('Failed to download the latest version from GitHub:', e)
+        # Place the window in the center of the screen
+        self.window.deiconify()  # Show the GUI
+        self.window.update_idletasks()  # Update the GUI
+        window_width = self.window.winfo_width()
+        window_height = self.window.winfo_height()
+        screen_width = self.window.winfo_screenwidth()
+        screen_height = self.window.winfo_screenheight()
+        x = (screen_width / 2) - (window_width / 2)
+        y = (screen_height / 2) - (window_height / 2)
+        self.window.geometry('%dx%d+%d+%d' % (window_width, window_height, x, y))
 
-    # Define the name of the temporary directory
-    temp_directory = 'temp'
+    def hyperlink_button_function(self):
+        webbrowser.open_new(r'https://github.com/Zamiell/' + mod_name + '/releases')
+        sys.exit()
 
-    # Check to see if the temporary directory exists
-    delete_file_if_exists(temp_directory)
+class NewVersion():
+    def __init__(self, parent):
+        # Initialize a new GUI window
+        self.parent = parent
+        self.window = tkinter.Toplevel(self.parent)
+        self.window.withdraw()  # Hide the GUI
+        self.window.title(mod_pretty_name + ' v' + mod_version)  # Set the GUI title
+        self.window.iconbitmap('images/the_d6.ico')  # Set the GUI icon
+        self.window.resizable(False, False)
+        self.window.protocol('WM_DELETE_WINDOW', sys.exit)
 
-    # Create the temporary directory
-    make_directory(temp_directory)
+        # "Version X.X.X has been released" message
+        new_version_message = tkinter.Message(self.window, justify=tkinter.CENTER, font='font 10', text='Version ' + latest_version + ' of ' + mod_pretty_name + ' has been released.\n(You are currently running version ' + mod_version + '.)', width=600)
+        new_version_message.grid(row=0, pady=10)
 
-    # Extract the zip file to the temporary directory
-    try:
-        with zipfile.ZipFile(mod_name + '.zip', 'r') as z:
-            z.extractall(temp_directory)
-    except Exception as e:
-        error('Failed to extract the downloaded "' + mod_name + '.zip" file:', e)
+        # "Automatically update and launch the new version" button
+        update_button = tkinter.Button(self.window, font='font 12', text='Automatically update and launch the new version')
+        update_button.configure(command=self.update_button_function)
+        update_button.grid(row=1, pady=10, padx=20)
 
-    # Delete the zip file
-    delete_file_if_exists(mod_name + '.zip')
+        # "Launch the old version" button
+        old_version_button = tkinter.Button(self.window, font='font 12', text='Launch the old version', command=parent.quit)
+        old_version_button.grid(row=2, pady=10)
 
-    # Check to see if the directory corresponding to the latest version already exists
-    delete_file_if_exists(latest_version)
+        # Place the window in the center of the screen
+        self.window.deiconify()  # Show the GUI
+        self.window.update_idletasks()  # Update the GUI
+        window_width = self.window.winfo_width()
+        window_height = self.window.winfo_height()
+        screen_width = self.window.winfo_screenwidth()
+        screen_height = self.window.winfo_screenheight()
+        x = (screen_width / 2) - (window_width / 2)
+        y = (screen_height / 2) - (window_height / 2)
+        self.window.geometry('%dx%d+%d+%d' % (window_width, window_height, x, y))
 
-    # Check to see if the "program" directory exists
-    if not os.path.isdir(os.path.join(temp_directory, mod_name, 'program')):
-        error('There was not a "program" directory in the downloaded zip file, so I don\'t know how to install it.\nTry downloading the latest version manually.', None)
+    def update_button_function(self):
+        # Global variables
+        global mod_version
+        global mod_options
 
-    # Check to see if "program.exe" exists (not strictly necessary but it is a sanity check)
-    if not os.path.isfile(os.path.join(temp_directory, mod_name, 'program', 'program.exe')):
-        error('There was not a "program.exe" file in the downloaded zip file, so I don\'t know how to install it.\nTry downloading the latest version manually.', None)
+        # Destroy the current window
+        self.window.destroy()
 
-    # Rename the "program" directory to the version number and move it up a directory
-    try:
-        os.rename(os.path.join(temp_directory, mod_name, 'program'), latest_version)
-    except Exception as e:
-        error('Failed to move the "program" directory:', e)
+        # Initialize a new GUI window
+        self.window = tkinter.Toplevel(self.parent)
+        #self.window.withdraw()  # Hide the GUI
+        self.window.title(mod_pretty_name + ' v' + mod_version)  # Set the GUI title
+        self.window.iconbitmap('images/the_d6.ico')  # Set the GUI icon
+        self.window.resizable(False, False)
+        self.window.protocol('WM_DELETE_WINDOW', sys.exit)
 
-    # Delete the temporary directory
-    delete_file_if_exists(temp_directory)
+        # Updating message
+        updating_message = tkinter.Message(self.window, justify=tkinter.CENTER, font='font 16', text='Updating...', width=600)
+        updating_message.pack()
 
-    # Delete the directory with the old version
-    global mod_version
-    delete_file_if_exists(mod_version)
+        # Place the window in the center of the screen
+        self.window.deiconify()  # Show the GUI
+        self.window.update_idletasks()  # Update the GUI
+        window_width = self.window.winfo_width()
+        window_height = self.window.winfo_height()
+        screen_width = self.window.winfo_screenwidth()
+        screen_height = self.window.winfo_screenheight()
+        x = (screen_width / 2) - (window_width / 2)
+        y = (screen_height / 2) - (window_height / 2)
+        self.window.geometry('%dx%d+%d+%d' % (window_width, window_height, x, y))
+        self.window.update()  # Necessary because we are not in a mainloop()
+        
+        # Check to see if the zip file already exists
+        delete_file_if_exists(mod_name + '.zip')
 
-    # Update options.ini with the new version
-    mod_version = latest_version
-    mod_options['options']['modversion'] = mod_version
-    try:
-        with open('options.ini', 'w') as config_file:
-            mod_options.write(config_file)
-    except Exception as e:
-        error('Failed to write the new version to the "options.ini" file:', e)
+        # Download the zip file
+        try:
+            url = 'https://github.com/Zamiell/' + mod_name + '/releases/download/' + latest_version + '/' + mod_name + '.zip'
+            urllib.request.urlretrieve(url, mod_name + '.zip')
+        except Exception as e:
+            error('Failed to download the latest version from GitHub:', e)
 
-    # Close the GUI and proceed with launching the program
-    root.quit()
+        # Define the name of the temporary directory
+        temp_directory = 'temp'
 
+        # Check to see if the temporary directory exists
+        delete_file_if_exists(temp_directory)
+
+        # Create the temporary directory
+        make_directory(temp_directory)
+
+        # Extract the zip file to the temporary directory
+        try:
+            with zipfile.ZipFile(mod_name + '.zip', 'r') as z:
+                z.extractall(temp_directory)
+        except Exception as e:
+            error('Failed to extract the downloaded "' + mod_name + '.zip" file:', e)
+
+        # Delete the zip file
+        delete_file_if_exists(mod_name + '.zip')
+
+        # Check to see if the directory corresponding to the latest version already exists
+        delete_file_if_exists(latest_version)
+
+        # Check to see if the "program" directory exists
+        if not os.path.isdir(os.path.join(temp_directory, mod_name, latest_version)):
+            error('There was not a "' + latest_version + '" directory in the downloaded zip file, so I don\'t know how to install it.\nTry downloading the latest version manually.', None)
+
+        # Check to see if "program.exe" exists (not strictly necessary but it is a sanity check)
+        if not os.path.isfile(os.path.join(temp_directory, mod_name, latest_version, 'program.exe')):
+            error('There was not a "program.exe" file in the downloaded zip file, so I don\'t know how to install it.\nTry downloading the latest version manually.', None)
+
+        # Move the version number (program) directory up two directories
+        try:
+            shutil.move(os.path.join(temp_directory, mod_name, latest_version), latest_version)
+        except Exception as e:
+            error('Failed to move the "program" directory:', e)
+
+        # Delete the temporary directory
+        delete_file_if_exists(temp_directory)
+
+        # Delete the directory with the old version
+        delete_file_if_exists(mod_version)
+
+        # Update options.ini with the new version
+        mod_version = latest_version
+        mod_options['options']['modversion'] = mod_version
+        try:
+            with open('options.ini', 'w') as config_file:
+                mod_options.write(config_file)
+        except Exception as e:
+            error('Failed to write the new version to the "options.ini" file:', e)
+
+        # Close the GUI and proceed with launching the program
+        self.parent.quit()
 
 ################
 # Main function
 ################
 
 def main():
+    # Global variables
+    global mod_options
+    global mod_version
+    global latest_version
+
     # TkInter callbacks run in different threads, so if we want to handle generic exceptions caused in a TkInter callback, we must define a specific custom exception handler for that
     tkinter.Tk.report_callback_exception = callback_error
 
@@ -219,12 +311,10 @@ def main():
 
     # Get the version number of the mod and the mod updater from options.ini
     mod_updater_version = mod_options['options']['modupdaterversion']
-    global mod_version
     mod_version = mod_options['options']['modversion']
     root.title(mod_pretty_name + ' v' + mod_version)  # Set the GUI title again now that we know the version
 
     # Check to see what the latest version of the mod is
-    global latest_version
     try:
         url = 'https://api.github.com/repos/Zamiell/' + mod_name + '-updater/releases/latest'
         github_info_json = urllib.request.urlopen(url).read().decode('utf8')
@@ -242,57 +332,17 @@ def main():
 
     # There is a new version of the updater, which cannot be automatically downloaded, so alert the user
     if mod_updater_version != latest_updater_version:
-        new_version_message = tkinter.Message(root, justify=tkinter.CENTER, font='font 10', text='A new version of ' + mod_pretty_name + ' has been released.\nUnfortunately, this version cannot be automatically updated.\n(You are currently running version ' + mod_version + '.)', width=600)
-        new_version_message.grid(row=0, pady=10)
-
-        hyperlink_button = tkinter.Button(root, font='font 12', text='Download the latest version', command=hyperlink_button_function)
-        hyperlink_button.grid(row=1, pady=10)
-
-        i_dont_care_button = tkinter.Button(root, font='font 12', text='I don\'t care', command=root.quit)
-        i_dont_care_button.grid(row=2, pady=10)
-
-        # Place the window in the center of the screen
-        root.deiconify()  # Show the GUI
-        root.update_idletasks()  # Update the GUI
-        window_width = root.winfo_width()
-        window_height = root.winfo_height()
-        screen_width = root.winfo_screenwidth()
-        screen_height = root.winfo_screenheight()
-        x = (screen_width / 2) - (window_width / 2)
-        y = (screen_height / 2) - (window_height / 2)
-        root.geometry('%dx%d+%d+%d' % (window_width, window_height, x, y))
-        tkinter.mainloop()  # Run in an infinite loop
-
-        # The user gave a response
-        root.withdraw()  # Hide the GUI
+        NewUpdaterVersion(root)
+        root.mainloop()
 
     # There is a new version of the mod, so ask the user if they want to automatically update
     elif mod_version != latest_version:
-        new_version_message = tkinter.Message(root, justify=tkinter.CENTER, font='font 10', text='Version ' + latest_version + ' of ' + mod_pretty_name + ' has been released.\n(You are currently running version ' + mod_version + '.)', width=600)
-        new_version_message.grid(row=0, pady=10)
+        NewVersion(root)
+        root.mainloop()
 
-        update_button = tkinter.Button(root, font='font 12', text='Automatically update and launch the new version', command=update_button_function)
-        update_button.grid(row=1, pady=10, padx=20)
-
-        old_version_button = tkinter.Button(root, font='font 12', text='Launch the old version', command=root.quit)
-        old_version_button.grid(row=2, pady=10)
-
-        updating_message = tkinter.Message(root, justify=tkinter.CENTER, font='font 16', text='Updating...', width=600)
-
-        # Place the window in the center of the screen
-        root.deiconify()  # Show the GUI
-        root.update_idletasks()  # Update the GUI
-        window_width = root.winfo_width()
-        window_height = root.winfo_height()
-        screen_width = root.winfo_screenwidth()
-        screen_height = root.winfo_screenheight()
-        x = (screen_width / 2) - (window_width / 2)
-        y = (screen_height / 2) - (window_height / 2)
-        root.geometry('%dx%d+%d+%d' % (window_width, window_height, x, y))
-        tkinter.mainloop()  # Run in an infinite loop
-
-        # The user gave a response, so proceed with launching the main program
-        root.withdraw()  # Hide the GUI
+    #####################################
+    # Proceed with launching the program
+    #####################################
 
     # Check to see if the directory for the program exists
     if not os.path.isdir(mod_version):

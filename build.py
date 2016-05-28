@@ -19,9 +19,6 @@ mod_options = configparser.ConfigParser()
 mod_options.read('options.ini')
 mod_version = mod_options['options']['modversion']
 
-# Define the installation directory
-install_name = mod_name + '-' + mod_version
-
 # Clean up build-related directories before we start to do anything
 if os.path.exists('build'):
 	shutil.rmtree('build')
@@ -45,9 +42,9 @@ subprocess.call([pyinstaller_path, '--onefile', '--windowed', '--icon=images/the
 shutil.rmtree('__pycache__')
 shutil.rmtree('program/__pycache__')
 
-# Make the installation directory inside the "release" directory
-install_directory = os.path.join('release', install_name)
-shutil.copytree('dist', install_directory)
+# Rename the "dist" directory to the name of the mod and move it to the "release" folder
+install_directory = os.path.join('release', mod_name)
+shutil.move('dist', install_directory)  # We use shutil.move() instead of os.rename() because it will create the intermediary directories
 
 # Copy over necessary files
 for file_name in ['options.ini', 'README.md', 'README-diversity-mod.md', 'README-instant-start-mod.md', 'Shortcut to BoIA Resources Folder.lnk']:
@@ -62,7 +59,7 @@ os.unlink(os.path.join(install_directory, 'program/program.py'))
 shutil.move(os.path.join(install_directory, 'program.exe'), os.path.join(install_directory, 'program/program.exe'))
 
 # Rename the "program" directory to the version number of the mod
-shutil.move(os.path.join(install_directory, 'program'), os.path.join(install_directory, mod_version))
+os.rename(os.path.join(install_directory, 'program'), os.path.join(install_directory, mod_version))
 
 # Rename README.md to README.txt extension so that noobs are less confused
 shutil.move(os.path.join(install_directory, 'README.md'), os.path.join(install_directory, 'README.txt'))
@@ -70,10 +67,9 @@ shutil.move(os.path.join(install_directory, 'README-diversity-mod.md'), os.path.
 shutil.move(os.path.join(install_directory, 'README-instant-start-mod.md'), os.path.join(install_directory, 'README-instant-start-mod.txt'))
 
 # Make the zip file
-shutil.make_archive(os.path.join('release', install_name), 'zip', 'release', install_name + '/')
+shutil.make_archive(os.path.join('release', mod_name), 'zip', 'release', mod_name + '/')
 
 # Clean up
 shutil.rmtree('build')
-shutil.rmtree('dist')
 os.unlink('isaac-racing-mods.spec')
 os.unlink('program.spec')
