@@ -60,3 +60,7 @@ target/
 
 #Ipython Notebook
 .ipynb_checkpoints
+
+# Repository specific stuff
+isaac-racing-mods-error-log.txt
+release/
