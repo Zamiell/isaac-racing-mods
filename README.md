@@ -1,4 +1,4 @@
-# Isaac Racing Mods v3.0.0
+# Isaac Racing Mods v3.0.1
 ##### A collection of racing mods for The Binding of Isaac: Afterbirth
 
 <br /><br />
@@ -36,14 +36,15 @@ Run the `isaac-racing-mods` program. You do not have to move any files or uninst
 
 ## Known Issues
 
-* Some users with the Avast antivirus application installed have reported that it will prevent the program from running. This is presumably because it is moving and deleting files in your "Program Files" directory. You will need to make an exception for the Diversity Mod program or disable your Avast completely.
-* When the program closes unexpectedly, it can leave mod files installed. To fix this and go back to a "vanilla" game, delete all of the files and folders in the Isaac "resources" directory except for the "packed" directory. (By default, the "resources" directory is located at `C:\Program Files (x86)\Steam\steamapps\common\The Binding of Isaac Rebirth\resources`.)
+* If the program closes unexpectedly, it can leave mod files installed. To fix this and go back to a "vanilla" game, delete all of the files and folders in the Isaac "resources" directory except for the "packed" directory. (By default, the "resources" directory is located at `C:\Program Files (x86)\Steam\steamapps\common\The Binding of Isaac Rebirth\resources`.)
 * There are no release versions for OS X or Linux. However, the program is written in Python 3 and is cross-platform. If you have the technical know how, you can just download the source code and run the Python script directly.
 
 <br />
 
 ## Version History
 
+* *3.0.1* - May 28th, 2016
+  * Fixed the bug with setting a custom Isaac resources folder location.
 * *3.0.0* - May 28th, 2016
   * This is the first version of the combined mod package. It starts at version 3.0.0 to signify that it is a subsequent version of v2.3.3, the final standalone release of Diversity Mod.
   * The standalone versions of Instant Start Mod and Diversity Mod will no longer be maintained. For now, the standalone version of Jud6s will continue to be maintained alongside this one.

@@ -138,6 +138,9 @@ def create_directory(path):
 ###########################
 
 def set_custom_path():
+    # Global variables
+    global mod_options
+
     # Open file dialog
     user_entered_isaac_location = tkinter.filedialog.askopenfilename()
 
@@ -1809,6 +1812,15 @@ def uninstall_mod():
 ################
 
 def main():
+    # Global variables
+    global mod_options
+    global mod_version
+    global isaac_resources_directory
+    global jud6s_version
+    global backed_up_resources_directory
+    global temp_directory
+    global items_info
+
     # TkInter callbacks run in different threads, so if we want to handle generic exceptions caused in a TkInter callback, we must define a specific custom exception handler for that
     tkinter.Tk.report_callback_exception = callback_error
 
@@ -1833,16 +1845,13 @@ def main():
         error('The "options.ini" does not contain an entry for the location of your Isaac resources directory.\nTry adding "isaacresourcesdirectory = C:\Program Files (x86)\Steam\SteamApps\common\The Binding of Isaac Rebirth\resources" or redownloading the program.', None)
 
     # Get the version number of the mod and the Isaac resources path from options.ini
-    global mod_version
     mod_version = mod_options['options']['modversion']
     root.title(mod_pretty_name + ' v' + mod_version)  # Set the GUI title again now that we know the version
-    global isaac_resources_directory
     isaac_resources_directory = mod_options['options']['isaacresourcesdirectory']
 
     # Get the version number of the Jud6s mod specifically (which is different than the version number of Isaac Racing Mods)
     try:
         with open('jud6s/jud6s_version.txt', 'r') as file:
-            global jud6s_version
             jud6s_version = file.read()
     except Exception as e:
         error('Failed to get the version number of the Jud6s mod from the "jud6s_version.txt" file:', e)
@@ -1867,7 +1876,6 @@ def main():
         error(mod_pretty_name + ' is located in a subdirectory of the resources directory.\nMove it elsewhere before running it.', None)
 
     # See if the resources directory has anything in it that we need to back up
-    global backed_up_resources_directory
     backed_up_resources_directory = False
     for file_name in os.listdir(isaac_resources_directory):
         if file_name != 'packed' and file_name != 'config.ini':
@@ -1878,7 +1886,6 @@ def main():
     if backed_up_resources_directory:
         # Create a temporarily directory
         epoch_time = str(int(time.time()))  # Get the current epoch timestamp
-        global temp_directory
         temp_directory = os.path.join(isaac_resources_directory, '..', 'resources_backup' + epoch_time)
         delete_file_if_exists(temp_directory)
         os.makedirs(temp_directory)
@@ -1891,7 +1898,6 @@ def main():
     # Parse items.xml now so that we can display some images; it will be parsed again before installation
     try:
         items_xml = xml.etree.ElementTree.parse('xml/items.vanilla.xml')
-        global items_info
         items_info = items_xml.getroot()
     except Exception as e:
         error('Failed to parse the "xml/items.vanilla.xml" file:', e)
