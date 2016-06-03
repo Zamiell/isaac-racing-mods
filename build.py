@@ -1,4 +1,4 @@
-#! C:\Python35\python.exe
+#! C:\Python34\python.exe
 
 # Notes:
 # - This file will "freeze" the Python code into an EXE and then package it into a ZIP file.
@@ -12,12 +12,18 @@ import configparser  # For parsing options.ini
 # Configuration
 mod_pretty_name = 'Isaac Racing Mods'
 mod_name = 'isaac-racing-mods'
-pyinstaller_path = 'C:\Python35\Scripts\pyinstaller.exe'
+pyinstaller_path = 'C:\Python34\Scripts\pyinstaller.exe'
 
 # Get the version number of the mod from options.ini
 mod_options = configparser.ConfigParser()
 mod_options.read('options.ini')
-mod_version = mod_options['options']['modversion']
+mod_version = mod_options['options']['mod_version']
+
+# Set the window_x and window_y to a reasonable standard value
+mod_options.set('options', 'window_x', '50')
+mod_options.set('options', 'window_y', '50')
+with open('options.ini', 'w') as config_file:
+    mod_options.write(config_file)
 
 # Clean up build-related directories before we start to do anything
 if os.path.exists('build'):

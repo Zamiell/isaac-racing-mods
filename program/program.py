@@ -1,4 +1,4 @@
-#! C:\Python35\python.exe
+#! C:\Python34\python.exe
 
 ####################
 # Isaac Racing Mods
@@ -13,22 +13,22 @@ import tkinter.messagebox     # This is not automatically imported above
 import tkinter.filedialog     # This is not automatically imported above
 import os                     # For various file operations (1/2)
 import shutil                 # For various file operations (2/2)
-import configparser           # For parsing options.ini
+import configparser           # For parsing the "options.ini" file
 import psutil                 # For finding and killing the running Isaac process
 import webbrowser             # For automatically launching Isaac
 import subprocess             # For restarting the program
-import time                   # For finding the Epoch timestamp
+import time                   # For finding the epoch timestamp
 import xml.etree.ElementTree  # For parsing the game's XML files (and builds.xml)
 import random                 # For getting a random start
 import re                     # For the search text box
 import string                 # For generating a random Diversity seed (1/2)
 import binascii               # For generating a random Diversity seed (2/2)
+import platform               # For operating system detection
 from PIL import Image, ImageFont, ImageDraw, ImageTk  # For drawing things on the title and character screen
 
 # Configuration
 mod_pretty_name = 'Isaac Racing Mods'
 mod_name = 'isaac-racing-mods'
-log_file = os.path.join('..', mod_name + '-error-log.txt')
 
 
 ############################
@@ -40,6 +40,9 @@ def error(message, exception):
     if exception is not None:
         message += '\n\n'
         message += traceback.format_exc()
+
+    # Print the message to standard out
+    print(message)
 
     # Log the error to a file
     logging.error(message)
@@ -59,6 +62,9 @@ def warning(message, exception):
         message += '\n\n'
         message += traceback.format_exc()
 
+    # Print the message to standard out
+    print(message)
+
     # Log the warning to a file
     logging.warning(message)
     with open(log_file, 'a') as file:
@@ -72,6 +78,9 @@ def callback_error(self, *args):
     # Build the error message
     message = 'Generic error:\n\n'
     message += traceback.format_exc()
+
+    # Print the message to standard out
+    print(message)
 
     # Log the error to a file
     logging.error(message)
@@ -160,7 +169,7 @@ def set_custom_path():
         error(mod_pretty_name + ' was not able to find the "resources" directory that is supposed to live next to "isaac-ng.exe".', None)
 
     # Write the new path to the INI file
-    mod_options.set('options', 'isaacresourcesdirectory', user_entered_resources_directory)
+    mod_options.set('options', 'isaac_resources_directory', user_entered_resources_directory)
     try:
         with open(os.path.join('..', 'options.ini'), 'w') as config_file:
             mod_options.write(config_file)
@@ -168,7 +177,7 @@ def set_custom_path():
         error('Failed to write the new directory path to the "options.ini" file:', e)
 
     # Alert the user
-    tkinter.messagebox.showinfo('Success', 'You have successfully set your Isaac resources directory.\nClick OK to restart ' + mod_pretty_name + '.')
+    tkinter.messagebox.showinfo('Success', 'You have successfully set your Isaac resources directory. Click OK to restart ' + mod_pretty_name + '.')
 
     # Restart the program
     try:
@@ -184,12 +193,13 @@ def set_custom_path():
 
 def launch_isaac():
     # If Isaac is running, kill it
-    try:
-        for process in psutil.process_iter():
-            if process.name() == 'isaac-ng.exe':
-                process.kill()
-    except Exception as e:
-        error(mod_pretty_name + ' could not automatically close Isaac:', e)
+    if platform.system() == 'Windows':  # This causes OS X to crash for some reason
+        try:
+            for process in psutil.process_iter():
+                if process.name() == 'isaac-ng.exe':
+                    process.kill()
+        except Exception as e:
+            error(mod_pretty_name + ' could not automatically close Isaac:', e)
 
     # Launch Isaac
     try:
@@ -296,7 +306,7 @@ class ModSelectionWindow():
         self.window.title(mod_pretty_name + ' v' + mod_version)  # Set the GUI title
         self.window.iconbitmap('images/icons/the_d6.ico')  # Set the GUI icon
         self.window.resizable(False, False)
-        self.window.protocol('WM_DELETE_WINDOW', uninstall_mod)  # Uninstall mod files when the window is closed
+        self.window.protocol('WM_DELETE_WINDOW', lambda: uninstall_mod(self))  # Uninstall mod files when the window is closed
 
         # Start counting rows
         row = 0
@@ -339,26 +349,22 @@ class ModSelectionWindow():
         spacing.grid(row=row)
         row += 1
 
-        # Place the window in the center of the screen
+        # Place the window at the X and Y coordinates from either the INI or the previous window
         self.window.deiconify()  # Show the GUI
-        self.window.update_idletasks()  # Update the GUI
-        window_width = self.window.winfo_width()
-        window_height = self.window.winfo_height()
-        screen_width = self.window.winfo_screenwidth()
-        screen_height = self.window.winfo_screenheight()
-        x = (screen_width / 2) - (window_width / 2)
-        y = (screen_height / 2) - (window_height / 2)
-        self.window.geometry('%dx%d+%d+%d' % (window_width, window_height, x, y))
+        self.window.geometry('+%d+%d' % (window_x, window_y))
 
     def show_jud6s_window(self):
+        get_window_x_y(self)
         self.window.destroy()
         Jud6sWindow(self.parent)
 
     def show_instant_start_window(self):
+        get_window_x_y(self)
         self.window.destroy()
         InstantStartWindow(self.parent)
 
     def show_diversity_window(self):
+        get_window_x_y(self)
         self.window.destroy()
         DiversityWindow(self.parent)
 
@@ -376,7 +382,7 @@ class Jud6sWindow():
         self.window.title('Jud6s Mod v' + jud6s_version)  # Set the GUI title
         self.window.iconbitmap('images/icons/the_d6.ico')  # Set the GUI icon
         self.window.resizable(False, False)
-        self.window.protocol('WM_DELETE_WINDOW', uninstall_mod)  # Uninstall mod files when the window is closed
+        self.window.protocol('WM_DELETE_WINDOW', lambda: uninstall_mod(self))  # Uninstall mod files when the window is closed
 
         # Start counting rows
         row = 0
@@ -388,7 +394,7 @@ class Jud6sWindow():
 
         # 1 - "Normal (Unseeded)" button
         ruleset1_button = tkinter.Button(self.window, text=' Normal / Unseeded (1) ', compound='left', width=375)
-        ruleset1_button.configure(font=("Helvetica", 13, "bold"))
+        ruleset1_button.configure(font=('Helvetica', 13, 'bold'))
         ruleset1_button.configure(command=lambda: self.install_jud6s_mod(1))
         ruleset1_button.icon = ImageTk.PhotoImage(get_item_icon('The D6'))
         ruleset1_button.configure(image=ruleset1_button.icon)
@@ -398,7 +404,7 @@ class Jud6sWindow():
 
         # 2 - "Seeded" button
         ruleset2_button = tkinter.Button(self.window, text=' Seeded (2) ', compound='left', width=375)
-        ruleset2_button.configure(font=("Helvetica", 13, "bold"))
+        ruleset2_button.configure(font=('Helvetica', 13, 'bold'))
         ruleset2_button.configure(command=lambda: self.install_jud6s_mod(2))
         ruleset2_button.icon = ImageTk.PhotoImage(get_item_icon('The Compass'))
         ruleset2_button.configure(image=ruleset2_button.icon)
@@ -408,7 +414,7 @@ class Jud6sWindow():
 
         # 3 - "Dark Room" button
         ruleset3_button = tkinter.Button(self.window, text=' Dark Room (3) ', compound='left', width=375)
-        ruleset3_button.configure(font=("Helvetica", 13, "bold"))
+        ruleset3_button.configure(font=('Helvetica', 13, 'bold'))
         ruleset3_button.configure(command=lambda: self.install_jud6s_mod(3))
         ruleset3_button.icon = ImageTk.PhotoImage(get_image('jud6s-extra/Ruleset 3 - Dark Room/gfx/items/collectibles/collectibles_327_thepolaroid.png'))
         ruleset3_button.configure(image=ruleset3_button.icon)
@@ -418,7 +424,7 @@ class Jud6sWindow():
 
         # 4 - "The Lost Child Open Loser's Bracket" button
         ruleset4_button = tkinter.Button(self.window, text=' The Lost Child Open Loser\'s Bracket (4) ', compound='left', width=375)
-        ruleset4_button.configure(font=("Helvetica", 13, "bold"))
+        ruleset4_button.configure(font=('Helvetica', 13, 'bold'))
         ruleset4_button.configure(command=lambda: self.install_jud6s_mod(4))
         ruleset4_button.icon = ImageTk.PhotoImage(get_item_icon('Judas\' Shadow'))
         ruleset4_button.configure(image=ruleset4_button.icon)
@@ -428,7 +434,7 @@ class Jud6sWindow():
 
         # 5 - "Mega Satan" button
         ruleset5_button = tkinter.Button(self.window, text=' Mega Satan (5) ', compound='left', width=375)
-        ruleset5_button.configure(font=("Helvetica", 13, "bold"))
+        ruleset5_button.configure(font=('Helvetica', 13, 'bold'))
         ruleset5_button.configure(command=lambda: self.install_jud6s_mod(5))
         ruleset5_button.icon = ImageTk.PhotoImage(get_item_icon('Key Piece 1'))
         ruleset5_button.configure(image=ruleset5_button.icon)
@@ -436,12 +442,32 @@ class Jud6sWindow():
         self.window.bind('5', lambda event: ruleset5_button.invoke())
         row += 1
 
+        # 6 - "Beginner" button
+        ruleset6_button = tkinter.Button(self.window, text=' Beginner (6) ', compound='left', width=375)
+        ruleset6_button.configure(font=('Helvetica', 13, 'bold'))
+        ruleset6_button.configure(command=lambda: self.install_jud6s_mod(6))
+        ruleset6_button.icon = ImageTk.PhotoImage(get_item_icon('The Soul'))
+        ruleset6_button.configure(image=ruleset6_button.icon)
+        ruleset6_button.grid(row=row, column=0, pady=5)
+        self.window.bind('6', lambda event: ruleset6_button.invoke())
+        row += 1
+
+        # 7 - "Don't Stop" button
+        ruleset7_button = tkinter.Button(self.window, text=' Don\'t Stop (7) ', compound='left', width=375)
+        ruleset7_button.configure(font=('Helvetica', 13, 'bold'))
+        ruleset7_button.configure(command=lambda: self.install_jud6s_mod(7))
+        ruleset7_button.icon = ImageTk.PhotoImage(get_item_icon('The Belt'))
+        ruleset7_button.configure(image=ruleset7_button.icon)
+        ruleset7_button.grid(row=row, column=0, pady=5)
+        self.window.bind('7', lambda event: ruleset5_button.invoke())
+        row += 1
+
         # "Go Back" button
-        go_back_button = tkinter.Button(self.window, text=' Go Back (6) ', compound='left')
-        go_back_button.configure(font=("Helvetica", 13))
+        go_back_button = tkinter.Button(self.window, text=' Go Back (8) ', compound='left')
+        go_back_button.configure(font=('Helvetica', 13))
         go_back_button.configure(command=self.go_back)
         go_back_button.grid(row=row, column=0, pady=25)
-        self.window.bind('6', lambda event: go_back_button.invoke())
+        self.window.bind('8', lambda event: go_back_button.invoke())
         row += 1
 
         # Instructions
@@ -460,16 +486,9 @@ class Jud6sWindow():
         spacing.grid(row=row)
         row += 1
 
-        # Place the window in the center of the screen
+        # Place the window at the X and Y coordinates from either the INI or the previous window
         self.window.deiconify()  # Show the GUI
-        self.window.update_idletasks()  # Update the GUI
-        window_width = self.window.winfo_width()
-        window_height = self.window.winfo_height()
-        screen_width = self.window.winfo_screenwidth()
-        screen_height = self.window.winfo_screenheight()
-        window_x = (screen_width / 2) - (window_width / 2)
-        window_y = (screen_height / 2) - (window_height / 2)
-        self.window.geometry('%dx%d+%d+%d' % (window_width, window_height, window_x, window_y))
+        self.window.geometry('+%d+%d' % (window_x, window_y))
 
     def install_jud6s_mod(self, ruleset):
         # Remove everything from the resources directory EXCEPT the "packed" directory and config.ini
@@ -484,14 +503,6 @@ class Jud6sWindow():
         # Copy over the "jud6s" directory, which represents the base files for the mod
         for file_name in os.listdir('jud6s'):
             copy_file(os.path.join('jud6s', file_name), os.path.join(isaac_resources_directory, file_name))
-
-        # Prepare the font for writing to the title screens later
-        if ruleset != 1:
-            large_font = ImageFont.truetype('fonts/IsaacSans.ttf', 19)
-            small_font = ImageFont.truetype('fonts/IsaacSans.ttf', 15)
-            title_img = Image.open('images/main-menu/titlemenu-base.png')
-            title_draw = ImageDraw.Draw(title_img)
-            title_screen_text = 'Jud6s Mod ' + jud6s_version
 
         # 1 - Normal / Unseeded
         if ruleset == 1:
@@ -517,11 +528,6 @@ class Jud6sWindow():
             # The custom angel rooms
             copy_file('jud6s-extra/' + ruleset_name + '/rooms/00.special rooms.stb', os.path.join(isaac_resources_directory, 'rooms/00.special rooms.stb'))
 
-            # Draw a title screen and save it overtop the old title screen
-            title_draw.text((345, 239), title_screen_text, (134, 86, 86), font=large_font)
-            title_draw.text((342, 256), ruleset_name, (134, 86, 86), font=small_font)
-            title_img.save(os.path.join(isaac_resources_directory, 'gfx/ui/main menu/titlemenu.png'))
-
         # 3 - Dark Room
         elif ruleset == 3:
             # Define the ruleset name
@@ -535,11 +541,6 @@ class Jud6sWindow():
 
             # The custom Polaroid and Negative
             copy_file('jud6s-extra/' + ruleset_name + '/gfx/items', os.path.join(isaac_resources_directory, 'gfx/items'))
-
-            # Draw a title screen and save it overtop the old title screen
-            title_draw.text((345, 239), title_screen_text, (134, 86, 86), font=large_font)
-            title_draw.text((333, 256), ruleset_name, (134, 86, 86), font=small_font)
-            title_img.save(os.path.join(isaac_resources_directory, 'gfx/ui/main menu/titlemenu.png'))
 
         # 4 - The Lost Child Open Loser's Bracket
         elif ruleset == 4:
@@ -558,10 +559,8 @@ class Jud6sWindow():
             # The changed starting items and health
             copy_file('jud6s-extra/' + ruleset_name + '/players.xml', os.path.join(isaac_resources_directory, 'players.xml'))
 
-            # Draw a title screen and save it overtop the old title screen
-            title_draw.text((345, 239), title_screen_text, (134, 86, 86), font=large_font)
-            title_draw.text((342, 256), 'LCO Loser\'s Bracket', (134, 86, 86), font=small_font)  # We don't use ruleset_name here because it is too long
-            title_img.save(os.path.join(isaac_resources_directory, 'gfx/ui/main menu/titlemenu.png'))
+            # The ruleset name is too long for the title screen, so make it shorter
+            ruleset_name = 'LCO Loser\'s Bracket'
 
         # 5 - Mega Satan
         elif ruleset == 5:
@@ -574,15 +573,43 @@ class Jud6sWindow():
             # The changed Chest
             copy_file('jud6s-extra/' + ruleset_name + '/rooms/17.chest.stb', os.path.join(isaac_resources_directory, 'rooms/17.chest.stb'))
 
-            # Draw a title screen and save it overtop the old title screen
-            title_draw.text((345, 239), title_screen_text, (134, 86, 86), font=large_font)
-            title_draw.text((322, 256), ruleset_name, (134, 86, 86), font=small_font)
+            # The ruleset name is too long for the title screen, so make it shorter
+            ruleset_name = 'Mega Satan'
+
+        # 6 - Beginner
+        elif ruleset == 6:
+            # Define the ruleset name
+            ruleset_name = 'Ruleset 6 - Beginner'
+
+            # The extra half soul heart
+            copy_file('jud6s-extra/' + ruleset_name + '/players.xml', os.path.join(isaac_resources_directory, 'players.xml'))
+
+        # 7 - Don't Stop
+        elif ruleset == 7:
+            # Define the ruleset name
+            ruleset_name = 'Ruleset 7 - Don\'t Stop'
+
+        # Draw a title screen and save it overtop the old title screen
+        if ruleset != 1:
+            title_img = Image.open('images/main-menu/titlemenu-base.png')
+            title_draw = ImageDraw.Draw(title_img)
+ 
+            title_screen_text = 'Jud6s Mod ' + jud6s_version
+            large_font = ImageFont.truetype('fonts/IsaacSans.ttf', 19)
+            w, h = title_draw.textsize(title_screen_text, font=large_font)
+            title_draw.text((405 - w / 2, 239), title_screen_text, (134, 86, 86), font=large_font)
+
+            small_font = ImageFont.truetype('fonts/IsaacSans.ttf', 15)
+            w, h = title_draw.textsize(ruleset_name, font=small_font)
+            title_draw.text((405 - w / 2, 256), ruleset_name, (134, 86, 86), font=small_font)
+
             title_img.save(os.path.join(isaac_resources_directory, 'gfx/ui/main menu/titlemenu.png'))
 
         # We are finished, so launch Isaac
         launch_isaac()
 
     def go_back(self):
+        get_window_x_y(self)
         self.window.destroy()
         ModSelectionWindow(self.parent)
 
@@ -605,7 +632,7 @@ class InstantStartWindow():
         self.window.title('Instant Start Mod v' + mod_version)  # Set the GUI title
         self.window.iconbitmap('images/icons/more_options.ico')  # Set the GUI icon
         self.window.resizable(False, False)
-        self.window.protocol('WM_DELETE_WINDOW', uninstall_mod)  # Uninstall mod files when the window is closed
+        self.window.protocol('WM_DELETE_WINDOW', lambda: uninstall_mod(self))  # Uninstall mod files when the window is closed
 
         # Start counting rows
         row = 0
@@ -661,7 +688,7 @@ class InstantStartWindow():
 
         # "Go Back" button
         go_back_button = tkinter.Button(self.window, text=' Go Back (6) ', compound='left')
-        go_back_button.configure(font=("Helvetica", 13))
+        go_back_button.configure(font=('Helvetica', 13))
         go_back_button.configure(command=self.go_back)
         go_back_button.grid(row=row, column=0, pady=25)
         self.window.bind('6', lambda event: go_back_button.invoke())
@@ -678,16 +705,9 @@ class InstantStartWindow():
         m.grid(row=row, column=0)
         row += 1
 
-        # Place the window in the center of the screen
+        # Place the window at the X and Y coordinates from either the INI or the previous window
         self.window.deiconify()  # Show the GUI
-        self.window.update_idletasks()  # Update the GUI
-        window_width = self.window.winfo_width()
-        window_height = self.window.winfo_height()
-        screen_width = self.window.winfo_screenwidth()
-        screen_height = self.window.winfo_screenheight()
-        window_x = (screen_width / 2) - (window_width / 2)
-        window_y = (screen_height / 2) - (window_height / 2)
-        self.window.geometry('%dx%d+%d+%d' % (window_width, window_height, window_x, window_y))
+        self.window.geometry('+%d+%d' % (window_x, window_y))
 
     def show_start_selector_window(self):
         #######################################
@@ -892,14 +912,17 @@ class InstantStartWindow():
             canvas.yview_scroll(int(-1 * (event.delta / 120)), 'units')
 
         def go_back():
+            get_window2_x_y(self)
             self.window2.destroy()  # Destroy the "Start Selector" window
             self.window.deiconify()  # Show the main Instant Start window
+            self.window.geometry('+%d+%d' % (window_x, window_y))
 
         #############################
         # show_start_selector_window
         #############################
 
         # Initialize a new GUI window
+        get_window_x_y(self)
         self.window.withdraw()  # Hide the main Instant Start window
         self.window2 = tkinter.Toplevel(self.parent)
 
@@ -907,7 +930,7 @@ class InstantStartWindow():
         self.window2.title('Start Selector')  # Set the GUI title
         self.window2.iconbitmap('images/icons/more_options.ico')  # Set the GUI icon
         self.window2.resizable(False, True)
-        self.window2.protocol('WM_DELETE_WINDOW', uninstall_mod)
+        self.window2.protocol('WM_DELETE_WINDOW', lambda: uninstall_mod(self))
 
         # Initialize the scrolling canvas
         canvas = tkinter.Canvas(self.window2, borderwidth=0)
@@ -942,13 +965,13 @@ class InstantStartWindow():
 
         # Search label
         search_widget_space = tkinter.Label(imageBox)
-        search_label = tkinter.Label(search_widget_space, text='Search: ', font=("Helvetica", 15))
+        search_label = tkinter.Label(search_widget_space, text='Search: ', font=('Helvetica', 15))
         search_label.grid(row=0, column=0)
 
         # Search text box
         build_search_string = tkinter.StringVar()
         build_search_string.trace('w', lambda name, index, mode, sv=build_search_string: search_builds(sv))
-        self.window2.entry = tkinter.Entry(search_widget_space, font=("Helvetica", 15), width=12, textvariable=build_search_string)
+        self.window2.entry = tkinter.Entry(search_widget_space, font=('Helvetica', 15), width=12, textvariable=build_search_string)
         self.window2.entry.bind('<Return>', lambda event: select_search_builds())
         self.window2.entry.grid(row=0, column=1)
         self.window2.entry.focus()  # Put the focus on the entry box whenever this window is opened
@@ -957,8 +980,8 @@ class InstantStartWindow():
 
         # "Go Back" button
         go_back_button = tkinter.Button(imageBox, text=' Go Back (Esc)', compound='left')
-        go_back_button.configure(font=("Helvetica", 11))
-        go_back_button.configure(command=go_back)  # Goes to nested function
+        go_back_button.configure(font=('Helvetica', 11))
+        go_back_button.configure(command=go_back)  # Goes to nested function, not class function
         go_back_button.grid(row=row, pady=15)
         row += 1
 
@@ -1080,20 +1103,12 @@ class InstantStartWindow():
             build_frame.grid(row=row, pady=5, padx=3, sticky=tkinter.W + tkinter.E)
             row += 1
 
-        # Place the window in the center of the screen
+        # Place the window at the X and Y coordinates from either the INI or the previous window
         self.window2.deiconify()  # Show the GUI
         self.window2.update_idletasks()  # Update the GUI
         window_width = imageBox.winfo_width() + scrollbar.winfo_width() + 2
         window_height = max(min(int(self.window2.winfo_vrootheight() * 2 / 3), imageBox.winfo_height() + 4), self.window2.winfo_height())
-        screen_width = self.window2.winfo_screenwidth()
-        screen_height = self.window2.winfo_screenheight()
-        x = (screen_width / 2) - (window_width / 2)
-        y = (screen_height / 2) - (window_height / 2)
-        self.window2.geometry('%dx%d+%d+%d' % (window_width, window_height, x, y))
-
-    def show_instant_start_window(self):
-        self.window2.destroy()
-        InstantStartWindow(self.parent)
+        self.window2.geometry('%dx%d+%d+%d' % (window_width, window_height, window_x, window_y))
 
     def get_random_start(self):
         self.current_build = str(random.randint(1, len(self.builds)))
@@ -1167,7 +1182,7 @@ class InstantStartWindow():
                 self.current_build = build  # Set it to the XML element corresponding to the build from builds.xml
                 break
         if isinstance(self.current_build, str):
-            error('Something went wrong with selecting a build.\n(The selected build number of ' + self.current_build + ' did not match any of the builds.)', None)
+            error('Something went wrong with selecting a build. (The selected build number of ' + self.current_build + ' did not match any of the builds.)', None)
 
         # Parse players.xml, items.xml, and itempools.xml
         players_xml = xml.etree.ElementTree.parse('jud6s/players.xml')
@@ -1368,6 +1383,7 @@ class InstantStartWindow():
         title_img.save(os.path.join(isaac_resources_directory, 'gfx/ui/main menu/titlemenu.png'))
 
     def go_back(self):
+        get_window_x_y(self)
         self.window.destroy()
         ModSelectionWindow(self.parent)
 
@@ -1390,7 +1406,7 @@ class DiversityWindow():
         self.window.title('Diversity Mod v' + mod_version)  # Set the GUI title
         self.window.iconbitmap('images/icons/rainbow_poop.ico')  # Set the GUI icon
         self.window.resizable(False, False)
-        self.window.protocol('WM_DELETE_WINDOW', uninstall_mod)  # Uninstall mod files when the window is closed
+        self.window.protocol('WM_DELETE_WINDOW', lambda: uninstall_mod(self))  # Uninstall mod files when the window is closed
 
         # Start counting rows
         row = 0
@@ -1450,11 +1466,10 @@ class DiversityWindow():
         row += 1
 
         # "Go Back" button
-        go_back_button = tkinter.Button(self.window, text=' Go Back (6) ', compound='left')
-        go_back_button.configure(font=("Helvetica", 13))
+        go_back_button = tkinter.Button(self.window, text=' Go Back ', compound='left')
+        go_back_button.configure(font=('Helvetica', 13))
         go_back_button.configure(command=self.go_back)
         go_back_button.grid(row=row, column=0, pady=25)
-        self.window.bind('6', lambda event: go_back_button.invoke())
         row += 1
 
         # Instructions
@@ -1473,16 +1488,9 @@ class DiversityWindow():
         spacing.grid(row=row)
         row += 1
 
-        # Place the window in the center of the screen
+        # Place the window at the X and Y coordinates from either the INI or the previous window
         self.window.deiconify()  # Show the GUI
-        self.window.update_idletasks()  # Update the GUI
-        window_width = self.window.winfo_width()
-        window_height = self.window.winfo_height()
-        screen_width = self.window.winfo_screenwidth()
-        screen_height = self.window.winfo_screenheight()
-        window_x = (screen_width / 2) - (window_width / 2)
-        window_y = (screen_height / 2) - (window_height / 2)
-        self.window.geometry('%dx%d+%d+%d' % (window_width, window_height, window_x, window_y))
+        self.window.geometry('+%d+%d' % (window_x, window_y))
 
     def new_random_seed(self):
         self.random_button_was_clicked = True
@@ -1580,8 +1588,8 @@ class DiversityWindow():
         items.append(get_item_dict(shuffed_items[2])['name'])
 
         # Load the fonts for drawing onto images
-        small_font = ImageFont.truetype('/fonts/comicbd.ttf', 10)
-        large_font = ImageFont.truetype('/fonts/comicbd.ttf', 16)
+        small_font = ImageFont.truetype('fonts/comicbd.ttf', 10)
+        large_font = ImageFont.truetype('fonts/comicbd.ttf', 16)
 
         # Draw the version number on the title menu graphic
         try:
@@ -1630,53 +1638,62 @@ class DiversityWindow():
                 del item.attrib['special']
 
         # Add the 3 random items to every character
-        characters_to_skip = ['Eden', 'Lazarus II', 'Black Judas', 'Keeper']  # The game crashes if you try to give Keeper items
+        characters_to_skip = ['Lazarus II', 'Black Judas', 'Keeper']  # The game crashes if you try to give Keeper items
         for character in players_info:
             if character.attrib['name'] in characters_to_skip:
                 continue
-            character.attrib['items'] += ',' + get_item_id(items[0]) + ',' + get_item_id(items[1]) + ',' + get_item_id(items[2])
+            if 'items' not in character.attrib.keys():  # Necessary for Eden
+                character.attrib['items'] = ''
+            if character.attrib['items'] != '':
+                character.attrib['items'] += ','
+            character.attrib['items'] += get_item_id(items[0]) + ',' + get_item_id(items[1]) + ',' + get_item_id(items[2])
 
         # Define the item bans
         removed_items = []
-        removed_items.append('Mom\'s Knife')
-        removed_items.append('Epic Fetus')
-        removed_items.append('Tech X')
-        removed_items.append('D4')
-        removed_items.append('D100')
+        if 'Mom\'s Knife' not in items:
+            removed_items.append('Mom\'s Knife')
+        if 'Epic Fetus' not in items:
+            removed_items.append('Epic Fetus')
+        if 'Tech X' not in items:
+            removed_items.append('Tech X')
+        if 'D4' not in items:
+            removed_items.append('D4')
+        if 'D100' not in items:
+            removed_items.append('D100')
 
         # Add some extra item bans if necessary
         if 'Soy Milk' in items or 'Libra' in items:
-            if 'Soy Milk' not in removed_items:
+            if 'Soy Milk' not in items and 'Soy Milk' not in removed_items:
                 removed_items.append('Soy Milk')
-            if 'Libra' not in removed_items:
+            if 'Libra' not in items and 'Libra' not in removed_items:
                 removed_items.append('Libra')
 
         if 'Isaac\'s Heart' in items:
-            if 'Blood Rights' not in removed_items:
+            if 'Blood Rights' not in items and 'Blood Rights' not in removed_items:
                 removed_items.append('Blood Rights')
 
         if 'Brimstone' in items:
-            if 'Tammy\'s Head' not in removed_items:
+            if 'Tammy\'s Head' not in items and 'Tammy\'s Head' not in removed_items:
                 removed_items.append('Tammy\'s Head')
 
         if 'Monstro\'s Lung' in items or 'Chocolate Milk' in items:
-            if 'Monstro\'s Lung' not in removed_items:
+            if 'Monstro\'s Lung' not in items and 'Monstro\'s Lung' not in removed_items:
                 removed_items.append('Monstro\'s Lung')
-            if 'Chocolate Milk' not in removed_items:
+            if 'Chocolate Milk' not in items and 'Chocolate Milk' not in removed_items:
                 removed_items.append('Chocolate Milk')
 
         if 'Ipecac' in items or 'Dr. Fetus' in items:
-            if 'Ipecac' not in removed_items:
+            if 'Ipecac' not in items and 'Ipecac' not in removed_items:
                 removed_items.append('Ipecac')
-            if 'Dr. Fetus' not in removed_items:
+            if 'Dr. Fetus' not in items and 'Dr. Fetus' not in removed_items:
                 removed_items.append('Dr. Fetus')
 
         if 'Technology 2' in items:
-            if 'Ipecac' not in removed_items:
+            if 'Ipecac' not in items and 'Ipecac' not in removed_items:
                 removed_items.append('Ipecac')
 
         if 'Monstro\'s Lung' in items:
-            if 'Ipecac' not in removed_items:
+            if 'Ipecac' not in items and 'Ipecac' not in removed_items:
                 removed_items.append('Ipecac')
 
         # Remove the banned items from all pools
@@ -1698,8 +1715,41 @@ class DiversityWindow():
         launch_isaac()
 
     def go_back(self):
+        get_window_x_y(self)
         self.window.destroy()
         ModSelectionWindow(self.parent)
+
+
+#####################################
+# General window functions
+#####################################
+
+def get_window_x_y(self):
+    # Global variables
+    global window_x
+    global window_y
+
+    # Get the X and Y location of the current window
+    match = re.search(r'\d+x\d+\+(-*\d+)\+(-*\d+)', self.window.geometry())
+    if match:
+        window_x = int(match.group(1))
+        window_y = int(match.group(2))
+    else:
+        error('Failed to parse the current window\'s X and Y coordinates.', None)
+
+
+def get_window2_x_y(self):
+    # Global variables
+    global window_x
+    global window_y
+
+    # Get the X and Y location of the current window
+    match = re.search(r'\d+x\d+\+(-*\d+)\+(-*\d+)', self.window2.geometry())
+    if match:
+        window_x = int(match.group(1))
+        window_y = int(match.group(2))
+    else:
+        error('Failed to parse the current window\'s X and Y coordinates.', None)
 
 
 #####################################
@@ -1784,11 +1834,18 @@ def get_trinket_icon(id):
 # Cleanup functions
 ####################
 
-def uninstall_mod():
+def uninstall_mod(self):
+    # Global variables
+    global mod_options
+
     # Remove everything from the resources directory EXCEPT the "packed" directory and config.ini
     for file_name in os.listdir(isaac_resources_directory):
         if file_name != 'packed' and file_name != 'config.ini':
             delete_file_if_exists(os.path.join(isaac_resources_directory, file_name))
+
+    # Delete config.ini also if it wasn't there before
+    if config_ini_exists == False:
+        delete_file_if_exists(os.path.join(isaac_resources_directory, 'config.ini'))
 
     # If we backed anything up initially when launching the program, copy it back
     if backed_up_resources_directory is True:
@@ -1803,6 +1860,16 @@ def uninstall_mod():
         # Remove the temporary directory we created
         delete_file_if_exists(temp_directory)
 
+    # Write the new path to the INI file
+    get_window_x_y(self)
+    mod_options.set('options', 'window_x', str(window_x))
+    mod_options.set('options', 'window_y', str(window_y))
+    try:
+        with open(os.path.join('..', 'options.ini'), 'w') as config_file:
+            mod_options.write(config_file)
+    except Exception as e:
+        error('Failed to write the window location to the "options.ini" file:', e)
+
     # Exit the program
     sys.exit()
 
@@ -1816,7 +1883,10 @@ def main():
     global mod_options
     global mod_version
     global isaac_resources_directory
+    global window_x
+    global window_y
     global jud6s_version
+    global config_ini_exists
     global backed_up_resources_directory
     global temp_directory
     global items_info
@@ -1827,27 +1897,29 @@ def main():
     # Initialize the root GUI
     root = tkinter.Tk()
     root.withdraw()  # Hide the GUI
-    root.iconbitmap('images/icons/the_d6.ico')  # Set the GUI icon
-    root.title(mod_pretty_name)  # Set the GUI title
-    root.resizable(False, False)
-    root.protocol('WM_DELETE_WINDOW', sys.exit)
 
-    # Validate that options.ini exists and contains the values we need
+    # Validate that "options.ini" file exists and contains the values we need
     if not os.path.isfile(os.path.join('..', 'options.ini')):
-        error('The "options.ini" file was not found in the ' + mod_pretty_name + ' directory.\nPlease redownload this program.', None)
+        error('The "options.ini" file was not found in the ' + mod_pretty_name + ' directory. Please redownload this program.', None)
     mod_options = configparser.ConfigParser()
     mod_options.read(os.path.join('..', 'options.ini'))
     if not mod_options.has_section('options'):
-        error('The "options.ini" file does not have an "[options]" section.\nPlease redownload this program.', None)
-    if 'modversion' not in mod_options['options']:  # configparser defaults everything to lowercase
-        error('The "options.ini" does not contain the version number of the mod.\nTry adding "modversion = 3.0.0" or redownloading the program.', None)
-    if 'isaacresourcesdirectory' not in mod_options['options']:  # configparser defaults everything to lowercase
-        error('The "options.ini" does not contain an entry for the location of your Isaac resources directory.\nTry adding "isaacresourcesdirectory = C:\Program Files (x86)\Steam\SteamApps\common\The Binding of Isaac Rebirth\resources" or redownloading the program.', None)
+        error('The "options.ini" file does not have an "[options]" section. Please redownload this program.', None)
+    if 'mod_version' not in mod_options['options']:
+        error('The "options.ini" file does not contain the version number of the mod. Try adding "mod_version = 3.0.0" or redownloading the program.', None)
+    if 'isaac_resources_directory' not in mod_options['options']:
+        error('The "options.ini" does not contain an entry for the location of your Isaac resources directory. Try adding "isaac_resources_directory = C:\Program Files (x86)\Steam\SteamApps\common\The Binding of Isaac Rebirth\resources" or redownloading the program.', None)
+    if 'window_x' not in mod_options['options']:
+        error('The "options.ini" file does not contain an entry for the X position of your window. Try adding "window_x = 50" or redownloading the program.', None)
+    if 'window_y' not in mod_options['options']:
+        error('The "options.ini" file does not contain an entry for the Y position of your window. Try adding "window_y = 50" or redownloading the program.', None)
 
-    # Get the version number of the mod and the Isaac resources path from options.ini
-    mod_version = mod_options['options']['modversion']
+    # Get variables from the "options.ini" file
+    mod_version = mod_options['options']['mod_version']
     root.title(mod_pretty_name + ' v' + mod_version)  # Set the GUI title again now that we know the version
-    isaac_resources_directory = mod_options['options']['isaacresourcesdirectory']
+    isaac_resources_directory = mod_options['options']['isaac_resources_directory']
+    window_x = int(mod_options['options']['window_x'])
+    window_y = int(mod_options['options']['window_y'])
 
     # Get the version number of the Jud6s mod specifically (which is different than the version number of Isaac Racing Mods)
     try:
@@ -1871,11 +1943,16 @@ def main():
         root.deiconify()
         tkinter.mainloop()
 
-    # Check if we are inside the resources path
+    # Check to see if we are inside a subdirectory of the resources folder
     if os.path.normpath(isaac_resources_directory).lower() in os.path.normpath(os.getcwd()).lower():
-        error(mod_pretty_name + ' is located in a subdirectory of the resources directory.\nMove it elsewhere before running it.', None)
+        error(mod_pretty_name + ' is located in a subdirectory of the resources directory. Move it elsewhere before running it.', None)
 
-    # See if the resources directory has anything in it that we need to back up
+    # Check to see if the user already has a config.ini in their resources folder
+    config_ini_exists = False
+    if os.path.isfile(os.path.join(isaac_resources_directory, 'config.ini')):
+        config_ini_exists = True
+
+    # Check to see if the resources directory has anything in it that we need to back up
     backed_up_resources_directory = False
     for file_name in os.listdir(isaac_resources_directory):
         if file_name != 'packed' and file_name != 'config.ini':
@@ -1913,6 +1990,7 @@ def main():
 
 if __name__ == '__main__':
     # Initialize logging
+    log_file = os.path.join('..', mod_name + '-error-log.txt')
     logging.basicConfig(
         filename=log_file,
         format='%(asctime)s - %(message)s',

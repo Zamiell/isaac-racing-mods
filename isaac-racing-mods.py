@@ -1,4 +1,8 @@
-#! C:\Python35\python.exe
+#! C:\Python34\python.exe
+
+#############################
+# Isaac Racing Mods Launcher
+#############################
 
 # Imports
 import sys                 # For quitting the application
@@ -9,16 +13,19 @@ import tkinter.messagebox  # This is not automatically imported above
 import os                  # For various file operations (1/2)
 import shutil              # For various file operations (2/2)
 import configparser        # For parsing options.ini
-import urllib.request      # For checking GitHub for the latest version (1/2)
-import json                # For checking GitHub for the latest version (2/2)
+import urllib.request      # For checking GitHub for the latest version
+import re                  # For parsing the options.ini file from GitHub
 import webbrowser          # For helping the user update when a new version is released
 import zipfile             # For automatically updating to the latest version
 import subprocess          # For running the actual program
+import time                # For slowing down the spinning animation
+import threading           # For spawning a new thread to do the update work in (1/2)
+import queue               # For spawning a new thread to do the update work in (2/2)
+from PIL import Image, ImageTk  # For rotating the dice
 
 # Configuration
 mod_pretty_name = 'Isaac Racing Mods'
 mod_name = 'isaac-racing-mods'
-log_file = mod_name + '-error-log.txt'
 
 
 ############################
@@ -30,6 +37,9 @@ def error(message, exception):
     if exception is not None:
         message += '\n\n'
         message += traceback.format_exc()
+
+    # Print the message to standard out
+    print(message)
 
     # Log the error to a file
     logging.error(message)
@@ -49,6 +59,9 @@ def warning(message, exception):
         message += '\n\n'
         message += traceback.format_exc()
 
+    # Print the message to standard out
+    print(message)
+
     # Log the warning to a file
     logging.warning(message)
     with open(log_file, 'a') as file:
@@ -62,6 +75,9 @@ def callback_error(self, *args):
     # Build the error message
     message = 'Generic error:\n\n'
     message += traceback.format_exc()
+
+    # Print the message to standard out
+    print(message)
 
     # Log the error to a file
     logging.error(message)
@@ -105,6 +121,24 @@ def make_directory(path):
         error('Failed to create the "' + path + '" directory:', e)
 
 
+#####################################
+# General window functions
+#####################################
+
+def get_window_x_y(self):
+    # Global variables
+    global window_x
+    global window_y
+
+    # Get the X and Y location of the current window
+    match = re.search(r'\d+x\d+\+(-*\d+)\+(-*\d+)', self.window.geometry())
+    if match:
+        window_x = int(match.group(1))
+        window_y = int(match.group(2))
+    else:
+        error('Failed to parse the current window\'s X and Y coordinates.', None)
+
+
 ####################################
 # The classes for the popup windows
 ####################################
@@ -118,7 +152,7 @@ class NewUpdaterVersion():
         self.window.title(mod_pretty_name + ' v' + mod_version)  # Set the GUI title
         self.window.iconbitmap('images/the_d6.ico')  # Set the GUI icon
         self.window.resizable(False, False)
-        self.window.protocol('WM_DELETE_WINDOW', sys.exit)
+        self.window.protocol('WM_DELETE_WINDOW', lambda: close_mod(self))
 
         new_updater_version_message = tkinter.Message(self.window, justify=tkinter.CENTER, font='font 10', text='A new version of ' + mod_pretty_name + ' has been released.\nUnfortunately, this version cannot be automatically updated.\n(You are currently running version ' + mod_version + '.)', width=600)
         new_updater_version_message.grid(row=0, pady=10)
@@ -130,20 +164,14 @@ class NewUpdaterVersion():
         i_dont_care_button = tkinter.Button(self.window, font='font 12', text='I don\'t care', command=parent.quit)
         i_dont_care_button.grid(row=2, pady=10)
 
-        # Place the window in the center of the screen
+        # Place the window at the X and Y coordinates from either the INI or the previous window
         self.window.deiconify()  # Show the GUI
-        self.window.update_idletasks()  # Update the GUI
-        window_width = self.window.winfo_width()
-        window_height = self.window.winfo_height()
-        screen_width = self.window.winfo_screenwidth()
-        screen_height = self.window.winfo_screenheight()
-        x = (screen_width / 2) - (window_width / 2)
-        y = (screen_height / 2) - (window_height / 2)
-        self.window.geometry('%dx%d+%d+%d' % (window_width, window_height, x, y))
+        self.window.geometry('+%d+%d' % (window_x, window_y))
 
     def hyperlink_button_function(self):
         webbrowser.open_new(r'https://github.com/Zamiell/' + mod_name + '/releases')
         sys.exit()
+
 
 class NewVersion():
     def __init__(self, parent):
@@ -154,7 +182,7 @@ class NewVersion():
         self.window.title(mod_pretty_name + ' v' + mod_version)  # Set the GUI title
         self.window.iconbitmap('images/the_d6.ico')  # Set the GUI icon
         self.window.resizable(False, False)
-        self.window.protocol('WM_DELETE_WINDOW', sys.exit)
+        self.window.protocol('WM_DELETE_WINDOW', lambda: close_mod(self))
 
         # "Version X.X.X has been released" message
         new_version_message = tkinter.Message(self.window, justify=tkinter.CENTER, font='font 10', text='Version ' + latest_version + ' of ' + mod_pretty_name + ' has been released.\n(You are currently running version ' + mod_version + '.)', width=600)
@@ -169,49 +197,106 @@ class NewVersion():
         old_version_button = tkinter.Button(self.window, font='font 12', text='Launch the old version', command=parent.quit)
         old_version_button.grid(row=2, pady=10)
 
-        # Place the window in the center of the screen
+        # Place the window at the X and Y coordinates from either the INI or the previous window
         self.window.deiconify()  # Show the GUI
-        self.window.update_idletasks()  # Update the GUI
-        window_width = self.window.winfo_width()
-        window_height = self.window.winfo_height()
-        screen_width = self.window.winfo_screenwidth()
-        screen_height = self.window.winfo_screenheight()
-        x = (screen_width / 2) - (window_width / 2)
-        y = (screen_height / 2) - (window_height / 2)
-        self.window.geometry('%dx%d+%d+%d' % (window_width, window_height, x, y))
+        self.window.geometry('+%d+%d' % (window_x, window_y))
 
     def update_button_function(self):
-        # Global variables
-        global mod_version
-        global mod_options
-
         # Destroy the current window
         self.window.destroy()
 
         # Initialize a new GUI window
         self.window = tkinter.Toplevel(self.parent)
-        #self.window.withdraw()  # Hide the GUI
+        self.window.withdraw()  # Hide the GUI
         self.window.title(mod_pretty_name + ' v' + mod_version)  # Set the GUI title
         self.window.iconbitmap('images/the_d6.ico')  # Set the GUI icon
         self.window.resizable(False, False)
-        self.window.protocol('WM_DELETE_WINDOW', sys.exit)
+        self.window.protocol('WM_DELETE_WINDOW', lambda: close_mod(self))
 
         # Updating message
-        updating_message = tkinter.Message(self.window, justify=tkinter.CENTER, font='font 16', text='Updating...', width=600)
+        updating_message = tkinter.Message(self.window, justify=tkinter.CENTER, font='font 40', text='Updating...', width=600)
         updating_message.pack()
 
-        # Place the window in the center of the screen
+        # Rotating dice
+        self.canvas = tkinter.Canvas(self.window, width=100, height=100)
+        self.canvas.pack()
+        self.process_next_frame = self.rotate_dice().__next__  # Using "next(self.rotate_dice())" doesn't work
+        self.parent.after(1, self.process_next_frame)
+
+        # Place the window at the X and Y coordinates from either the INI or the previous window
         self.window.deiconify()  # Show the GUI
-        self.window.update_idletasks()  # Update the GUI
-        window_width = self.window.winfo_width()
-        window_height = self.window.winfo_height()
-        screen_width = self.window.winfo_screenwidth()
-        screen_height = self.window.winfo_screenheight()
-        x = (screen_width / 2) - (window_width / 2)
-        y = (screen_height / 2) - (window_height / 2)
-        self.window.geometry('%dx%d+%d+%d' % (window_width, window_height, x, y))
-        self.window.update()  # Necessary because we are not in a mainloop()
-        
+        self.window.geometry('+%d+%d' % (window_x, window_y))
+
+        # Spawn an update thread
+        self.parent.after(1, self.start_update)
+
+    def rotate_dice(self):
+        image = Image.open('images/the_d6.ico')
+        angle = 0
+        while True:
+            tkimage = ImageTk.PhotoImage(image.rotate(angle))
+            canvas_object = self.canvas.create_image(50, 35, image=tkimage)
+            self.parent.after_idle(self.process_next_frame)
+            yield
+            self.canvas.delete(canvas_object)
+            angle += 1
+            angle %= 360
+            time.sleep(0.002)
+
+    def start_update(self):
+        self.thread_potentially_failed = False
+        self.queue = queue.Queue()
+        UpdaterTask(self.queue).start()
+        self.parent.after(100, self.process_queue)
+
+    def process_queue(self):
+        # Global variables
+        global mod_version
+        global mod_options
+
+        try:
+            # Poll to see if the updating thread is finished its work yet
+            msg = self.queue.get(0)
+
+            # It has finished, so update options.ini with the new version
+            global mod_version
+            global mod_options
+
+            mod_version = latest_version
+            mod_options['options']['mod_version'] = mod_version
+            try:
+                with open('options.ini', 'w') as config_file:
+                    mod_options.write(config_file)
+            except Exception as e:
+                error('Failed to write the new version to the "options.ini" file:', e)
+
+            # Close the GUI and proceed with launching the program
+            self.parent.quit()
+
+        except queue.Empty:
+            main_thread = threading.currentThread()
+            thread_still_working = False
+            for thread in threading.enumerate():
+                if thread is not main_thread:
+                    thread_still_working = True
+            if thread_still_working == True:
+                self.parent.after(100, self.process_queue)
+            else:
+                # The thread could have ended before the queue processor got a chance to read the queue message, so let it go one more time
+                if self.thread_potentially_failed == False:
+                    self.thread_potentially_failed = True
+                    self.parent.after(100, self.process_queue)
+                else:
+                    # This is the second go around, so the update thread must have really failed
+                    sys.exit()
+
+
+class UpdaterTask(threading.Thread):
+    def __init__(self, queue):
+        threading.Thread.__init__(self)
+        self.queue = queue
+
+    def run(self):
         # Check to see if the zip file already exists
         delete_file_if_exists(mod_name + '.zip')
 
@@ -264,17 +349,24 @@ class NewVersion():
         # Delete the directory with the old version
         delete_file_if_exists(mod_version)
 
-        # Update options.ini with the new version
-        mod_version = latest_version
-        mod_options['options']['modversion'] = mod_version
-        try:
-            with open('options.ini', 'w') as config_file:
-                mod_options.write(config_file)
-        except Exception as e:
-            error('Failed to write the new version to the "options.ini" file:', e)
+        # Signal that the update is completed
+        self.queue.put('Task finished')
 
-        # Close the GUI and proceed with launching the program
-        self.parent.quit()
+
+def close_mod(self):
+    # Write the new path to the INI file
+    get_window_x_y(self)
+    mod_options.set('options', 'window_x', str(window_x))
+    mod_options.set('options', 'window_y', str(window_y))
+    try:
+        with open(os.path.join('..', 'options.ini'), 'w') as config_file:
+            mod_options.write(config_file)
+    except Exception as e:
+        error('Failed to write the window location to the "options.ini" file:', e)
+
+    # Exit the program
+    sys.exit()
+
 
 ################
 # Main function
@@ -284,6 +376,8 @@ def main():
     # Global variables
     global mod_options
     global mod_version
+    global window_x
+    global window_y
     global latest_version
 
     # TkInter callbacks run in different threads, so if we want to handle generic exceptions caused in a TkInter callback, we must define a specific custom exception handler for that
@@ -292,44 +386,55 @@ def main():
     # Initialize the GUI
     root = tkinter.Tk()
     root.withdraw()  # Hide the GUI
-    root.iconbitmap('images/the_d6.ico')  # Set the GUI icon
-    root.title(mod_pretty_name)  # Set the GUI title
-    root.resizable(False, False)
-    root.protocol('WM_DELETE_WINDOW', sys.exit)
 
-    # Validate that options.ini exists and contains the values we need
+    # Validate that "options.ini" file exists and contains the values we need
     if not os.path.isfile('options.ini'):
-        error('The "options.ini" file was not found in the ' + mod_pretty_name + ' directory.\nPlease redownload this program.', None)
+        error('The "options.ini" file was not found in the ' + mod_pretty_name + ' directory. Please redownload this program.', None)
     mod_options = configparser.ConfigParser()
     mod_options.read('options.ini')
     if not mod_options.has_section('options'):
-        error('The "options.ini" file does not have an "[options]" section.\nPlease redownload this program.', None)
-    if 'modupdaterversion' not in mod_options['options']:  # configparser defaults everything to lowercase
-        error('The "options.ini" does not contain the version number of the mod updater.\nTry adding "modupdaterversion = 1.0.0" or redownloading the program.', None)
-    if 'modversion' not in mod_options['options']:  # configparser defaults everything to lowercase
-        error('The "options.ini" does not contain the version number of the mod.\nTry adding "modversion = 3.0.0" or redownloading the program.', None)
+        error('The "options.ini" file does not have an "[options]" section. Please redownload this program.', None)
+    if 'mod_updater_version' not in mod_options['options']:
+        error('The "options.ini" file does not contain the version number of the mod updater. Try adding "mod_updater_version = 1.0.0" or redownloading the program.', None)
+    if 'mod_version' not in mod_options['options']:
+        error('The "options.ini" file does not contain the version number of the mod. Try adding "mod_version = 3.0.0" or redownloading the program.', None)
+    if 'window_x' not in mod_options['options']:
+        error('The "options.ini" file does not contain an entry for the X position of your window. Try adding "window_x = 50" or redownloading the program.', None)
+    if 'window_y' not in mod_options['options']:
+        error('The "options.ini" file does not contain an entry for the Y position of your window. Try adding "window_y = 50" or redownloading the program.', None)
 
-    # Get the version number of the mod and the mod updater from options.ini
-    mod_updater_version = mod_options['options']['modupdaterversion']
-    mod_version = mod_options['options']['modversion']
+    # Get variables from the "options.ini" file
+    mod_updater_version = mod_options['options']['mod_updater_version']
+    mod_version = mod_options['options']['mod_version']
     root.title(mod_pretty_name + ' v' + mod_version)  # Set the GUI title again now that we know the version
+    window_x = int(mod_options['options']['window_x'])
+    window_y = int(mod_options['options']['window_y'])
 
     # Check to see what the latest version of the mod is
     try:
-        url = 'https://api.github.com/repos/Zamiell/' + mod_name + '-updater/releases/latest'
-        github_info_json = urllib.request.urlopen(url).read().decode('utf8')
-        info = json.loads(github_info_json)
-        latest_updater_version = info['name']
+        url = 'https://raw.githubusercontent.com/Zamiell/' + mod_name + '/master/options.ini'
+        master_options_ini = urllib.request.urlopen(url).read().decode('utf8')
 
-        url = 'https://api.github.com/repos/Zamiell/' + mod_name + '/releases/latest'
-        github_info_json = urllib.request.urlopen(url).read().decode('utf8')
-        info = json.loads(github_info_json)
-        latest_version = info['name']
+        # Get the mod version
+        match = re.search(r'mod_version = (\d+.\d+.\d+)', master_options_ini)
+        if match:
+            latest_version = match.group(1)
+        else:
+            warning('When trying to find what the latest version is, I failed to find the "mod_version" line in the "options.ini" file from GitHub.', None)
+            latest_version = mod_version
+
+        # Get the mod updater version
+        match = re.search(r'mod_updater_version = (\d+.\d+.\d+)', master_options_ini)
+        if match:
+            latest_updater_version = match.group(1)
+        else:
+            warning('When trying to find what the latest version is, I failed to find the "mod_updater_version" line in the "options.ini" file from GitHub.', None)
+            latest_updater_version = mod_updater_version
     except Exception as e:
         warning('Failed to check GitHub for the latest version:', e)
-        latest_updater_version = mod_updater_version
         latest_version = mod_version
-
+        latest_updater_version = mod_updater_version
+        
     # There is a new version of the updater, which cannot be automatically downloaded, so alert the user
     if mod_updater_version != latest_updater_version:
         NewUpdaterVersion(root)
@@ -363,6 +468,7 @@ def main():
 
 if __name__ == '__main__':
     # Initialize logging
+    log_file = mod_name + '-error-log.txt'
     logging.basicConfig(
         filename=log_file,
         format='%(asctime)s - %(message)s',
