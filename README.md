@@ -54,13 +54,13 @@ You can find the documentation for the "Normal / Unseeded" ruleset on [the GitHu
 * Judas starts with Judas' Shadow in addition to his other items.
 * Judas starts with 0 health.
 
-### Extra Changes in the "Mega Satan" ruleset
+#### Extra Changes in the "Mega Satan" ruleset
 * Pedestals for Key Piece 1 and Key Piece 2 are placed next to the Mega Satan door.
 
-### Extra Changes in the "Beginner" ruleset
+#### Extra Changes in the "Beginner" ruleset
 * Judas starts with 1 red heart and 1 full soul heart instead of of 1 red heart and 1 half soul heart.
 
-### Extra Changes in the "Don't Stop" ruleset
+#### Extra Changes in the "Don't Stop" ruleset
 * A soul heart appears at the beginning of every floor.
 
 <br />
