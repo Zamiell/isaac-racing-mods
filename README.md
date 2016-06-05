@@ -70,12 +70,16 @@ You can find the documentation for the "Normal / Unseeded" ruleset on [the GitHu
 * If the program closes unexpectedly, it can leave mod files installed. To fix this and go back to a "vanilla" game, delete all of the files and folders in the Isaac "resources" directory except for the "packed" directory. (By default, the "resources" directory is located at `C:\Program Files (x86)\Steam\steamapps\common\The Binding of Isaac Rebirth\resources`.)
 * There are no release versions for OS X or Linux. However, the program is written in Python 3.4 and is cross-platform. If you have the technical know how, you can just download the source code and run the Python script directly (see below).
 
+<br />
+
 ## Running from Source
 
 * `python --version` (to confirm that you are using Python 3.x)
 * `pip install psutil`
 * `pip install pillow`
 * `python program/program.py` (`program.py` is the actual program and `isaac-racing-mods.py` is the automatic updater)
+
+<br />
 
 ## Building from Source (only tested on Windows)
 
