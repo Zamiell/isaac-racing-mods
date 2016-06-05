@@ -36,7 +36,12 @@ def error(message, exception):
     # Build the error message
     if exception is not None:
         message += '\n\n'
-        message += traceback.format_exc()
+        if type(exception) is tuple:  # We are not in an exception; we got passed the exception information from the thread
+            list_of_strings = traceback.format_exception(exception[0], exception[1], exception[2])
+            for line in list_of_strings:
+                message += line
+        else:  # We are in an exception
+            message += traceback.format_exc()
 
     # Print the message to standard out
     print(message)
@@ -89,36 +94,6 @@ def callback_error(self, *args):
 
     # Exit the program immediately
     sys.exit()
-
-
-##############################
-# File manipulation functions
-##############################
-
-def delete_file_if_exists(path):
-    if os.path.exists(path):
-        if os.path.isfile(path):
-            try:
-                os.remove(path)
-            except Exception as e:
-                error('Failed to delete the "' + path + '" file:', e)
-        elif os.path.isdir(path):
-            try:
-                shutil.rmtree(path)
-            except Exception as e:
-                error('Failed to delete the "' + path + '" directory:', e)
-        else:
-            error('Failed to delete "' + path + '", as it is not a file or a directory.', None)
-
-
-def make_directory(path):
-    if os.path.exists(path):
-        error('Failed to create the "' + path + '" directory, as a file or folder already exists by that name.', None)
-
-    try:
-        os.makedirs(path)
-    except Exception as e:
-        error('Failed to create the "' + path + '" directory:', e)
 
 
 #####################################
@@ -220,8 +195,10 @@ class NewVersion():
         # Rotating dice
         self.canvas = tkinter.Canvas(self.window, width=100, height=100)
         self.canvas.pack()
-        self.process_next_frame = self.rotate_dice().__next__  # Using "next(self.rotate_dice())" doesn't work
-        self.parent.after(1, self.process_next_frame)
+        self.dice_angle = 0
+        self.d6_image = Image.open('images/the_d6.ico')
+        self.rotated_d6 = ImageTk.PhotoImage(self.d6_image)
+        self.d6 = self.canvas.create_image(50, 35, image=self.rotated_d6)
 
         # Place the window at the X and Y coordinates from either the INI or the previous window
         self.window.deiconify()  # Show the GUI
@@ -230,33 +207,34 @@ class NewVersion():
         # Spawn an update thread
         self.parent.after(1, self.start_update)
 
-    def rotate_dice(self):
-        image = Image.open('images/the_d6.ico')
-        angle = 0
-        while True:
-            tkimage = ImageTk.PhotoImage(image.rotate(angle))
-            canvas_object = self.canvas.create_image(50, 35, image=tkimage)
-            self.parent.after_idle(self.process_next_frame)
-            yield
-            self.canvas.delete(canvas_object)
-            angle += 1
-            angle %= 360
-            time.sleep(0.002)
-
     def start_update(self):
         self.thread_potentially_failed = False
         self.queue = queue.Queue()
-        UpdaterTask(self.queue).start()
-        self.parent.after(100, self.process_queue)
+        self.updater_task = UpdaterTask(self.queue)
+        self.updater_task.start()
+        self.parent.after(50, self.process_queue)
 
     def process_queue(self):
         # Global variables
         global mod_version
         global mod_options
 
+        # Rotate the dice
+        self.rotate_dice()
+
+        # Let new things happen in GUI land
+        #self.window.update_idletasks()
+
         try:
             # Poll to see if the updating thread is finished its work yet
-            msg = self.queue.get(0)
+            message = self.queue.get_nowait()
+
+            # Check to see if the message is an exception
+            if type(message) is tuple:
+                # An exception has occurred
+                error(message[0], message[1])
+            elif message != 'Task finished':
+                error('Got an unknown message from updater task.', None)
 
             # It has finished, so update options.ini with the new version
             global mod_version
@@ -274,21 +252,24 @@ class NewVersion():
             self.parent.quit()
 
         except queue.Empty:
-            main_thread = threading.currentThread()
-            thread_still_working = False
-            for thread in threading.enumerate():
-                if thread is not main_thread:
-                    thread_still_working = True
-            if thread_still_working == True:
-                self.parent.after(100, self.process_queue)
+            if self.updater_task.is_alive() == True:
+                self.parent.after(50, self.process_queue)
             else:
                 # The thread could have ended before the queue processor got a chance to read the queue message, so let it go one more time
                 if self.thread_potentially_failed == False:
                     self.thread_potentially_failed = True
                     self.parent.after(100, self.process_queue)
+
+                # This is the second go around, so the update thread must have really failed
                 else:
-                    # This is the second go around, so the update thread must have really failed
                     sys.exit()
+
+    def rotate_dice(self):
+        self.canvas.delete(self.d6)
+        self.dice_angle -= 15
+        self.dice_angle -= 360
+        self.rotated_d6 = ImageTk.PhotoImage(self.d6_image.rotate(self.dice_angle))
+        self.d6 = self.canvas.create_image(50, 35, image=self.rotated_d6)
 
 
 class UpdaterTask(threading.Thread):
@@ -298,60 +279,84 @@ class UpdaterTask(threading.Thread):
 
     def run(self):
         # Check to see if the zip file already exists
-        delete_file_if_exists(mod_name + '.zip')
+        self.delete_file_if_exists(mod_name + '.zip')
 
         # Download the zip file
         try:
             url = 'https://github.com/Zamiell/' + mod_name + '/releases/download/' + latest_version + '/' + mod_name + '.zip'
             urllib.request.urlretrieve(url, mod_name + '.zip')
         except Exception as e:
-            error('Failed to download the latest version from GitHub:', e)
+            self.error('Failed to download the latest version from GitHub:', e)
 
         # Define the name of the temporary directory
         temp_directory = 'temp'
 
         # Check to see if the temporary directory exists
-        delete_file_if_exists(temp_directory)
+        self.delete_file_if_exists(temp_directory)
 
         # Create the temporary directory
-        make_directory(temp_directory)
+        if os.path.exists(temp_directory):
+            self.error('Failed to create the "' + temp_directory + '" directory, as a file or folder already exists by that name.', None)
+        try:
+            os.makedirs(temp_directory)
+        except Exception as e:
+            self.error('Failed to create the "' + temp_directory + '" directory:', sys.exc_info())
 
         # Extract the zip file to the temporary directory
         try:
             with zipfile.ZipFile(mod_name + '.zip', 'r') as z:
                 z.extractall(temp_directory)
         except Exception as e:
-            error('Failed to extract the downloaded "' + mod_name + '.zip" file:', e)
+            self.error('Failed to extract the downloaded "' + mod_name + '.zip" file:', e)
 
         # Delete the zip file
-        delete_file_if_exists(mod_name + '.zip')
+        self.delete_file_if_exists(mod_name + '.zip')
 
         # Check to see if the directory corresponding to the latest version already exists
-        delete_file_if_exists(latest_version)
+        self.delete_file_if_exists(latest_version)
 
         # Check to see if the "program" directory exists
         if not os.path.isdir(os.path.join(temp_directory, mod_name, latest_version)):
-            error('There was not a "' + latest_version + '" directory in the downloaded zip file, so I don\'t know how to install it.\nTry downloading the latest version manually.', None)
+            self.error('There was not a "' + latest_version + '" directory in the downloaded zip file, so I don\'t know how to install it.\nTry downloading the latest version manually.', None)
 
         # Check to see if "program.exe" exists (not strictly necessary but it is a sanity check)
         if not os.path.isfile(os.path.join(temp_directory, mod_name, latest_version, 'program.exe')):
-            error('There was not a "program.exe" file in the downloaded zip file, so I don\'t know how to install it.\nTry downloading the latest version manually.', None)
+            self.error('There was not a "program.exe" file in the downloaded zip file, so I don\'t know how to install it.\nTry downloading the latest version manually.', None)
 
         # Move the version number (program) directory up two directories
         try:
             shutil.move(os.path.join(temp_directory, mod_name, latest_version), latest_version)
         except Exception as e:
-            error('Failed to move the "program" directory:', e)
+            self.error('Failed to move the "program" directory:', e)
 
         # Delete the temporary directory
-        delete_file_if_exists(temp_directory)
+        self.delete_file_if_exists(temp_directory)
 
         # Delete the directory with the old version
-        delete_file_if_exists(mod_version)
+        self.delete_file_if_exists(mod_version)
 
         # Signal that the update is completed
         self.queue.put('Task finished')
+        sys.exit()  # This will only terminate the existing thread
 
+    def delete_file_if_exists(self, path):
+        if os.path.exists(path):
+            if os.path.isfile(path):
+                try:
+                    os.remove(path)
+                except Exception as e:
+                    self.error('Failed to delete the "' + path + '" file:', e)
+            elif os.path.isdir(path):
+                try:
+                    shutil.rmtree(path)
+                except Exception as e:
+                    self.error('Failed to delete the "' + path + '" directory:', e)
+            else:
+                self.error('Failed to delete "' + path + '", as it is not a file or a directory.', None)
+                
+    def error(self, message, exception):
+        self.queue.put((message, sys.exc_info() if exception != None else None))  # A tuple indicates an exception has occurred
+        sys.exit()
 
 def close_mod(self):
     # Write the new path to the INI file
@@ -364,7 +369,12 @@ def close_mod(self):
     except Exception as e:
         error('Failed to write the window location to the "options.ini" file:', e)
 
-    # Exit the program
+    # Exit the program in a messy way if there is an existing thread
+    if hasattr(self, 'updater_task'):
+        if self.updater_task.is_alive() == True:
+            os._exit(1)  # Can't use "sys.exit()" here because it won't terminate the existing thread
+
+    # There is no existing thread, so exit the program normally
     sys.exit()
 
 
@@ -416,20 +426,25 @@ def main():
         master_options_ini = urllib.request.urlopen(url).read().decode('utf8')
 
         # Get the mod version
+        failed_check = False
         match = re.search(r'mod_version = (\d+.\d+.\d+)', master_options_ini)
         if match:
             latest_version = match.group(1)
         else:
             warning('When trying to find what the latest version is, I failed to find the "mod_version" line in the "options.ini" file from GitHub.', None)
             latest_version = mod_version
+            failed_check = True
 
         # Get the mod updater version
         match = re.search(r'mod_updater_version = (\d+.\d+.\d+)', master_options_ini)
         if match:
             latest_updater_version = match.group(1)
+        elif failed_check == True:
+            pass  # Don't spam the user with 2 warning dialog boxes
         else:
             warning('When trying to find what the latest version is, I failed to find the "mod_updater_version" line in the "options.ini" file from GitHub.', None)
             latest_updater_version = mod_updater_version
+
     except Exception as e:
         warning('Failed to check GitHub for the latest version:', e)
         latest_version = mod_version
