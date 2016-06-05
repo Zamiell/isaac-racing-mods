@@ -1,4 +1,4 @@
-# Isaac Racing Mods v3.0.2
+# Isaac Racing Mods v3.1.0
 ##### A collection of racing mods for The Binding of Isaac: Afterbirth
 
 <br /><br />
