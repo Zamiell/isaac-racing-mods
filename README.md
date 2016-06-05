@@ -34,13 +34,6 @@ Run the `isaac-racing-mods` program. You do not have to move any files or uninst
 
 <br />
 
-## Known Issues
-
-* If the program closes unexpectedly, it can leave mod files installed. To fix this and go back to a "vanilla" game, delete all of the files and folders in the Isaac "resources" directory except for the "packed" directory. (By default, the "resources" directory is located at `C:\Program Files (x86)\Steam\steamapps\common\The Binding of Isaac Rebirth\resources`.)
-* There are no release versions for OS X or Linux. However, the program is written in Python 3.4 and is cross-platform. If you have the technical know how, you can just download the source code and run the Python script directly. (If you get import errors, you will have to "pip install [package_name]" to install the relevant package.)
-
-<br />
-
 ## Jud6s Custom Rulesets
 
 You can find the documentation for the "Normal / Unseeded" ruleset on [the GitHub page for the Jud6s Mod](https://github.com/Zamiell/jud6s). Occasionally, other modified rulesets are used for racing:
@@ -69,6 +62,24 @@ You can find the documentation for the "Normal / Unseeded" ruleset on [the GitHu
 
 ### Extra Changes in the "Don't Stop" ruleset
 * A soul heart appears at the beginning of every floor.
+
+<br />
+
+## Known Issues
+
+* If the program closes unexpectedly, it can leave mod files installed. To fix this and go back to a "vanilla" game, delete all of the files and folders in the Isaac "resources" directory except for the "packed" directory. (By default, the "resources" directory is located at `C:\Program Files (x86)\Steam\steamapps\common\The Binding of Isaac Rebirth\resources`.)
+* There are no release versions for OS X or Linux. However, the program is written in Python 3.4 and is cross-platform. If you have the technical know how, you can just download the source code and run the Python script directly (see below).
+
+## Running from Source
+
+* `python --version` (to confirm that you are using Python 3.x)
+* `pip install psutil`
+* `pip install pillow`
+* `python program/program.py` (`program.py` is the actual program and `isaac-racing-mods.py` is the automatic updater)
+
+## Building from Source (only tested on Windows)
+
+* `python build.py` (will make a subdirectory called `release`)
 
 <br />
 
