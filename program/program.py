@@ -589,6 +589,11 @@ class Jud6sWindow():
             # Define the ruleset name
             ruleset_name = 'Ruleset 7 - Don\'t Stop'
 
+            # The custom start rooms
+            copy_file('jud6s-extra/' + ruleset_name + '/rooms/00.special rooms.stb', os.path.join(isaac_resources_directory, 'rooms/00.special rooms.stb'))
+            copy_file('jud6s-extra/' + ruleset_name + '/rooms/16.dark room.stb', os.path.join(isaac_resources_directory, 'rooms/16.dark room.stb'))
+            copy_file('jud6s-extra/' + ruleset_name + '/rooms/17.chest.stb', os.path.join(isaac_resources_directory, 'rooms/17.chest.stb'))
+
         # Draw a title screen and save it overtop the old title screen
         if ruleset != 1:
             title_img = Image.open('images/main-menu/titlemenu-base.png')

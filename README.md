@@ -1,4 +1,4 @@
-# Isaac Racing Mods v3.1.0
+# Isaac Racing Mods v3.1.1
 ##### A collection of racing mods for The Binding of Isaac: Afterbirth
 
 <br /><br />
@@ -89,7 +89,9 @@ You can find the documentation for the "Normal / Unseeded" ruleset on [the GitHu
 
 ## Version History
 
-* *3.1.0* - June 2nd
+* *3.1.1* - June 5th
+  * The "Don't Stop" Jud6s ruleset should work properly now.
+* *3.1.0* - June 4th
   * Added the files for the Jud6s Mod v1.26.
   * Added a 7th option to the Jud6s launcher for "Beginners", which is the ruleset used in the Basement series of tournaments.
   * Added an 8th option to the Jud6s launcher for "Don't Stop", which is the ruleset used in one of the legs of the Real Platinum Rod relay event.
