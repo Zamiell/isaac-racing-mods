@@ -77,7 +77,9 @@ You can find the documentation for the "Normal / Unseeded" ruleset on [the GitHu
 * `python --version` (to confirm that you are using Python 3.x)
 * `pip install psutil`
 * `pip install pillow`
-* `python program/program.py` (`program.py` is the actual program and `isaac-racing-mods.py` is the automatic updater)
+* `cd isaac-racing-mods/program`
+* `nano ../options.ini` (set isaac_resources_directory equal to your resources directory)
+* `python program.py` (`program.py` is the actual program and `isaac-racing-mods.py` is the automatic updater)
 
 <br />
 

@@ -329,6 +329,13 @@ class UpdaterTask(threading.Thread):
         except Exception as e:
             self.error('Failed to move the "program" directory:', e)
 
+        # Copy the 3 README files
+        for file_name in ['README.txt', 'README-diversity-mod.txt', 'README-instant-start-mod.txt']:
+            if not os.path.isfile(os.path.join(temp_directory, mod_name, file_name)):
+                self.error('There was not a "' + file_name + '" file in the downloaded zip file, so I can\'t copy it over.\nTry downloading the latest version manually.', None)
+            self.delete_file_if_exists(file_name);
+            self.copy_file(os.path.join(temp_directory, mod_name, file_name), file_name)
+
         # Delete the temporary directory
         self.delete_file_if_exists(temp_directory)
 
@@ -353,7 +360,24 @@ class UpdaterTask(threading.Thread):
                     self.error('Failed to delete the "' + path + '" directory:', e)
             else:
                 self.error('Failed to delete "' + path + '", as it is not a file or a directory.', None)
-                
+
+    def copy_file(self, path1, path2):
+        if not os.path.exists(path1):
+            self.error('Copying "' + path1 + '" failed because it does not exist.', None)
+
+        if os.path.isfile(path1):
+            try:
+                shutil.copyfile(path1, path2)
+            except Exception as e:
+                self.error('Failed to copy the "' + path1 + '" file:', e)
+        elif os.path.isdir(path1):
+            try:
+                shutil.copytree(path1, path2)
+            except Exception as e:
+                self.error('Failed to copy the "' + path1 + '" directory:', e)
+        else:
+            self.error('Failed to copy "' + path1 + '", as it is not a file or a directory.', None)
+
     def error(self, message, exception):
         self.queue.put((message, sys.exc_info() if exception != None else None))  # A tuple indicates an exception has occurred
         sys.exit()
