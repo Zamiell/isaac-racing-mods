@@ -85,6 +85,9 @@ You can find the documentation for the "Normal / Unseeded" ruleset on [the GitHu
 
 ## Building from Source (only tested on Windows)
 
+* `python --version` (to confirm that you are using Python 3.x)
+* `pip install pyinstaller`
+* `cd isaac-racing-mods`
 * `python build.py` (will make a subdirectory called `release`)
 
 <br />

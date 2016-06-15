@@ -27,15 +27,15 @@ with open('options.ini', 'w') as config_file:
 
 # Clean up build-related directories before we start to do anything
 if os.path.exists('build'):
-	shutil.rmtree('build')
+    shutil.rmtree('build')
 if os.path.exists('dist'):
-	shutil.rmtree('dist')
+    shutil.rmtree('dist')
 if os.path.exists('__pycache__'):
     shutil.rmtree('__pycache__')
 if os.path.exists('program/__pycache__'):
     shutil.rmtree('program/__pycache__')
 if os.path.exists('release'):
-	shutil.rmtree('release')
+    shutil.rmtree('release')
 
 # Freeze the updater and the main program into an exe
 if not os.path.isfile(pyinstaller_path):
@@ -54,9 +54,9 @@ shutil.move('dist', install_directory)  # We use shutil.move() instead of os.ren
 
 # Copy over necessary files
 for file_name in ['options.ini', 'README.md', 'README-diversity-mod.md', 'README-instant-start-mod.md', 'Shortcut to BoIA Resources Folder.lnk']:
-	shutil.copy(file_name, os.path.join(install_directory, file_name))
+    shutil.copy(file_name, os.path.join(install_directory, file_name))
 for directory_name in ['images', 'program']:
-	shutil.copytree(directory_name, os.path.join(install_directory, directory_name))
+    shutil.copytree(directory_name, os.path.join(install_directory, directory_name))
 
 # Remove "program.py"
 os.unlink(os.path.join(install_directory, 'program/program.py'))
