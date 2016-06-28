@@ -17,7 +17,7 @@ import configparser           # For parsing the "options.ini" file
 import psutil                 # For finding and killing the running Isaac process
 import webbrowser             # For automatically launching Isaac
 import subprocess             # For restarting the program
-import time                   # For finding the epoch timestamp
+import time                   # For finding the epoch timestamp and sleeping before launching
 import xml.etree.ElementTree  # For parsing the game's XML files (and builds.xml)
 import random                 # For getting a random start
 import re                     # For the search text box
@@ -29,6 +29,7 @@ from PIL import Image, ImageFont, ImageDraw, ImageTk  # For drawing things on th
 # Configuration
 mod_pretty_name = 'Isaac Racing Mods'
 mod_name = 'isaac-racing-mods'
+#mod_name = 'isaac-test'
 
 
 ############################
@@ -201,6 +202,9 @@ def launch_isaac():
         except Exception as e:
             error(mod_pretty_name + ' could not automatically close Isaac:', e)
 
+    # Wait 0.5 seconds before launching to try and prevent the bug where only certain parts of the mod get loaded
+    time.sleep(0.5)
+
     # Launch Isaac
     try:
         webbrowser.open('steam://rungameid/250900')
@@ -313,7 +317,7 @@ class ModSelectionWindow():
 
         # Select a mod
         select_message = tkinter.Message(self.window, justify=tkinter.CENTER, text='Select a mod:', font='font 20', width=400)
-        select_message.grid(row=row, column=0, pady=5)
+        select_message.grid(row=row, pady=5)
         row += 1
 
         # "Jud6s" button
@@ -321,7 +325,7 @@ class ModSelectionWindow():
         jud6s_button.configure(command=self.show_jud6s_window)
         jud6s_button.icon = ImageTk.PhotoImage(get_item_icon('The D6'))
         jud6s_button.configure(image=jud6s_button.icon)
-        jud6s_button.grid(row=row, column=0, pady=5, padx=50)
+        jud6s_button.grid(row=row, pady=5, padx=50)
         self.window.bind('1', lambda event: jud6s_button.invoke())
         row += 1
 
@@ -330,7 +334,7 @@ class ModSelectionWindow():
         instant_start_button.configure(command=self.show_instant_start_window)
         instant_start_button.icon = ImageTk.PhotoImage(get_item_icon('More Options'))
         instant_start_button.configure(image=instant_start_button.icon)
-        instant_start_button.grid(row=row, column=0, pady=5)
+        instant_start_button.grid(row=row, pady=5)
         self.window.bind('2', lambda event: instant_start_button.invoke())
         row += 1
 
@@ -340,7 +344,7 @@ class ModSelectionWindow():
         diversity_button.image = Image.open('images/icons/rainbow_poop_small.ico')
         diversity_button.icon = ImageTk.PhotoImage(diversity_button.image)
         diversity_button.configure(image=diversity_button.icon)
-        diversity_button.grid(row=row, column=0, pady=5)
+        diversity_button.grid(row=row, pady=5)
         self.window.bind('3', lambda event: diversity_button.invoke())
         row += 1
 
@@ -389,7 +393,7 @@ class Jud6sWindow():
 
         # Select a mod
         select_message = tkinter.Message(self.window, justify=tkinter.CENTER, text='Select a ruleset:', font='font 20', width=400)
-        select_message.grid(row=row, column=0, pady=5)
+        select_message.grid(row=row, pady=5)
         row += 1
 
         # 1 - "Normal (Unseeded)" button
@@ -398,7 +402,7 @@ class Jud6sWindow():
         ruleset1_button.configure(command=lambda: self.install_jud6s_mod(1))
         ruleset1_button.icon = ImageTk.PhotoImage(get_item_icon('The D6'))
         ruleset1_button.configure(image=ruleset1_button.icon)
-        ruleset1_button.grid(row=row, column=0, pady=5, padx=50)
+        ruleset1_button.grid(row=row, pady=5, padx=50)
         self.window.bind('1', lambda event: ruleset1_button.invoke())
         row += 1
 
@@ -408,7 +412,7 @@ class Jud6sWindow():
         ruleset2_button.configure(command=lambda: self.install_jud6s_mod(2))
         ruleset2_button.icon = ImageTk.PhotoImage(get_item_icon('The Compass'))
         ruleset2_button.configure(image=ruleset2_button.icon)
-        ruleset2_button.grid(row=row, column=0, pady=5)
+        ruleset2_button.grid(row=row, pady=5)
         self.window.bind('2', lambda event: ruleset2_button.invoke())
         row += 1
 
@@ -418,7 +422,7 @@ class Jud6sWindow():
         ruleset3_button.configure(command=lambda: self.install_jud6s_mod(3))
         ruleset3_button.icon = ImageTk.PhotoImage(get_image('jud6s-extra/Ruleset 3 - Dark Room/gfx/items/collectibles/collectibles_327_thepolaroid.png'))
         ruleset3_button.configure(image=ruleset3_button.icon)
-        ruleset3_button.grid(row=row, column=0, pady=5)
+        ruleset3_button.grid(row=row, pady=5)
         self.window.bind('3', lambda event: ruleset3_button.invoke())
         row += 1
 
@@ -428,7 +432,7 @@ class Jud6sWindow():
         ruleset4_button.configure(command=lambda: self.install_jud6s_mod(4))
         ruleset4_button.icon = ImageTk.PhotoImage(get_item_icon('Judas\' Shadow'))
         ruleset4_button.configure(image=ruleset4_button.icon)
-        ruleset4_button.grid(row=row, column=0, pady=5)
+        ruleset4_button.grid(row=row, pady=5)
         self.window.bind('4', lambda event: ruleset4_button.invoke())
         row += 1
 
@@ -438,7 +442,7 @@ class Jud6sWindow():
         ruleset5_button.configure(command=lambda: self.install_jud6s_mod(5))
         ruleset5_button.icon = ImageTk.PhotoImage(get_item_icon('Key Piece 1'))
         ruleset5_button.configure(image=ruleset5_button.icon)
-        ruleset5_button.grid(row=row, column=0, pady=5)
+        ruleset5_button.grid(row=row, pady=5)
         self.window.bind('5', lambda event: ruleset5_button.invoke())
         row += 1
 
@@ -448,7 +452,7 @@ class Jud6sWindow():
         ruleset6_button.configure(command=lambda: self.install_jud6s_mod(6))
         ruleset6_button.icon = ImageTk.PhotoImage(get_item_icon('The Soul'))
         ruleset6_button.configure(image=ruleset6_button.icon)
-        ruleset6_button.grid(row=row, column=0, pady=5)
+        ruleset6_button.grid(row=row, pady=5)
         self.window.bind('6', lambda event: ruleset6_button.invoke())
         row += 1
 
@@ -458,7 +462,7 @@ class Jud6sWindow():
         ruleset7_button.configure(command=lambda: self.install_jud6s_mod(7))
         ruleset7_button.icon = ImageTk.PhotoImage(get_item_icon('The Belt'))
         ruleset7_button.configure(image=ruleset7_button.icon)
-        ruleset7_button.grid(row=row, column=0, pady=5)
+        ruleset7_button.grid(row=row, pady=5)
         self.window.bind('7', lambda event: ruleset5_button.invoke())
         row += 1
 
@@ -466,19 +470,19 @@ class Jud6sWindow():
         go_back_button = tkinter.Button(self.window, text=' Go Back (8) ', compound='left')
         go_back_button.configure(font=('Helvetica', 13))
         go_back_button.configure(command=self.go_back)
-        go_back_button.grid(row=row, column=0, pady=25)
+        go_back_button.grid(row=row, pady=25)
         self.window.bind('8', lambda event: go_back_button.invoke())
         row += 1
 
         # Instructions
         m = tkinter.Message(self.window, justify=tkinter.CENTER, text='Isaac will open when you start the mod.', font='font 13', width=400)
-        m.grid(row=row, column=0)
+        m.grid(row=row)
         row += 1
         m = tkinter.Message(self.window, justify=tkinter.CENTER, text='Keep this program open while playing.', font='font 13', width=400)
-        m.grid(row=row, column=0)
+        m.grid(row=row)
         row += 1
         m = tkinter.Message(self.window, justify=tkinter.CENTER, text='Isaac will return to normal when this program is closed.\n', font='font 13', width=400)
-        m.grid(row=row, column=0)
+        m.grid(row=row)
         row += 1
 
         # Spacing
@@ -519,7 +523,7 @@ class Jud6sWindow():
             # The removed unseeded items
             copy_file('jud6s-extra/' + ruleset_name + '/itempools.xml', os.path.join(isaac_resources_directory, 'itempools.xml'))
 
-            # The removed trinket
+            # The removed trinkets
             copy_file('jud6s-extra/' + ruleset_name + '/items.xml', os.path.join(isaac_resources_directory, 'items.xml'))
 
             # The added starting items
@@ -644,7 +648,7 @@ class InstantStartWindow():
 
         # Spacing
         m = tkinter.Message(self.window, text='', font='font 7')
-        m.grid(row=row, column=0)
+        m.grid(row=row)
         row += 1
 
         # "Choose a Start" button
@@ -652,7 +656,7 @@ class InstantStartWindow():
         choose_start_button.configure(command=self.show_start_selector_window)
         choose_start_button.icon = ImageTk.PhotoImage(get_item_icon('More Options'))
         choose_start_button.configure(image=choose_start_button.icon)
-        choose_start_button.grid(row=row, column=0, pady=5)
+        choose_start_button.grid(row=row, pady=5)
         self.window.bind('1', lambda event: choose_start_button.invoke())
         row += 1
 
@@ -661,58 +665,73 @@ class InstantStartWindow():
         random_start_button.configure(command=self.get_random_start)
         random_start_button.icon = ImageTk.PhotoImage(get_item_icon('???'))
         random_start_button.configure(image=random_start_button.icon)
-        random_start_button.grid(row=row, column=0, pady=5)
+        random_start_button.grid(row=row, pady=5)
         self.window.bind('2', lambda event: random_start_button.invoke())
         row += 1
 
         # Spacing
         m = tkinter.Message(self.window, text='', font='font 7')
-        m.grid(row=row, column=0)
+        m.grid(row=row)
         row += 1
 
         # Seeded checkbox
         self.seeded_mode = tkinter.IntVar()
-        seeded_checkbox = tkinter.Checkbutton(self.window, text='Seeded (3)', font='font 14', variable=self.seeded_mode)
-        seeded_checkbox.grid(row=row, column=0)
-        self.window.bind('3', lambda event: seeded_checkbox.invoke())
+        self.seeded_checkbox = tkinter.Checkbutton(self.window, text='Seeded (3)', font='font 14', variable=self.seeded_mode, command=self.seeded_checkbox_checked)
+        self.seeded_checkbox.grid(row=row)
+        self.window.bind('3', lambda event: self.seeded_checkbox.invoke())
+        row += 1
+
+        # Seeded+ checkbox
+        self.seeded2_mode = tkinter.IntVar()
+        self.seeded2_checkbox = tkinter.Checkbutton(self.window, text='Seeded+ (4)', font='font 14', variable=self.seeded2_mode, command=self.seeded2_checkbox_checked)
+        self.seeded2_checkbox.grid(row=row)
+        self.window.bind('4', lambda event: self.seeded2_checkbox.invoke())
         row += 1
 
         # LCO checkbox
         self.LCO_mode = tkinter.IntVar()
-        LCO_checkbox = tkinter.Checkbutton(self.window, anchor=tkinter.E, text='Lost Child Open (4)', font='font 14', variable=self.LCO_mode)
-        LCO_checkbox.grid(row=row, column=0)
-        self.window.bind('4', lambda event: LCO_checkbox.invoke())
+        LCO_checkbox = tkinter.Checkbutton(self.window, anchor=tkinter.E, text='Lost Child Open (5)', font='font 14', variable=self.LCO_mode)
+        LCO_checkbox.grid(row=row)
+        self.window.bind('5', lambda event: LCO_checkbox.invoke())
         row += 1
 
         # Mega Satan checkbox
         self.mega_satan_mode = tkinter.IntVar()
-        mega_satan_checkbox = tkinter.Checkbutton(self.window, text='Mega Satan (5)', font='font 14', variable=self.mega_satan_mode)
-        mega_satan_checkbox.grid(row=row, column=0)
-        self.window.bind('5', lambda event: mega_satan_checkbox.invoke())
+        mega_satan_checkbox = tkinter.Checkbutton(self.window, text='Mega Satan (6)', font='font 14', variable=self.mega_satan_mode)
+        mega_satan_checkbox.grid(row=row)
+        self.window.bind('6', lambda event: mega_satan_checkbox.invoke())
         row += 1
 
         # "Go Back" button
-        go_back_button = tkinter.Button(self.window, text=' Go Back (6) ', compound='left')
+        go_back_button = tkinter.Button(self.window, text=' Go Back (7) ', compound='left')
         go_back_button.configure(font=('Helvetica', 13))
         go_back_button.configure(command=self.go_back)
-        go_back_button.grid(row=row, column=0, pady=25)
-        self.window.bind('6', lambda event: go_back_button.invoke())
+        go_back_button.grid(row=row, pady=25)
+        self.window.bind('7', lambda event: go_back_button.invoke())
         row += 1
 
         # Instructions
         m = tkinter.Message(self.window, justify=tkinter.CENTER, text='Isaac will open when you start the mod.', font='font 13', width=400)
-        m.grid(row=row, column=0)
+        m.grid(row=row)
         row += 1
         m = tkinter.Message(self.window, justify=tkinter.CENTER, text='Keep this program open while playing.', font='font 13', width=400)
-        m.grid(row=row, column=0)
+        m.grid(row=row)
         row += 1
         m = tkinter.Message(self.window, justify=tkinter.CENTER, text='Isaac will return to normal when this program is closed.\n', font='font 13', width=400)
-        m.grid(row=row, column=0)
+        m.grid(row=row)
         row += 1
 
         # Place the window at the X and Y coordinates from either the INI or the previous window
         self.window.deiconify()  # Show the GUI
         self.window.geometry('+%d+%d' % (window_x, window_y))
+
+    def seeded_checkbox_checked(self):
+        if self.seeded_mode.get() == 1 and self.seeded2_mode.get() == 1:
+            self.seeded2_checkbox.invoke()
+
+    def seeded2_checkbox_checked(self):
+        if self.seeded_mode.get() == 1 and self.seeded2_mode.get() == 1:
+            self.seeded_checkbox.invoke()
 
     def show_start_selector_window(self):
         #######################################
@@ -1016,7 +1035,12 @@ class InstantStartWindow():
             elif index == 25:
                 tkinter.Message(imageBox, text='', font='font 12').grid(row=row)  # Spacing
                 row += 1
-                tkinter.Label(imageBox, text='Custom Starts', font='font 20 bold').grid(row=row, pady=5)
+                tkinter.Label(imageBox, text='Custom Starts (with the D6)', font='font 20 bold').grid(row=row, pady=5)
+                row += 1
+            elif index == 29:
+                tkinter.Message(imageBox, text='', font='font 12').grid(row=row)  # Spacing
+                row += 1
+                tkinter.Label(imageBox, text='Custom Starts (without the D6)', font='font 20 bold').grid(row=row, pady=5)
                 row += 1
 
             # Background color
@@ -1132,6 +1156,28 @@ class InstantStartWindow():
                     if item.attrib['Id'] == item_id:  # Weirdly, it is capitalized this way in the vanilla XML
                         pool.remove(item)
 
+        def remove_item_from_shop_pool(item_name):
+            item_id = get_item_id(item_name)
+            for pool in itempools_info:
+                if pool.attrib['Name'] != 'shop':
+                    continue
+                for item in pool.findall('Item'):
+                    if item.attrib['Id'] == item_id:  # Weirdly, it is capitalized this way in the vanilla XML
+                        pool.remove(item)
+
+        def add_item_to_shop_pool(item_name):
+            item_id = get_item_id(item_name)
+            for pool in itempools_info:
+                if pool.attrib['Name'] == 'shop':
+                    item_xml = '<Item DecreaseBy="1" Id="' + item_id + '" RemoveOn="0.1" Weight="1" />'
+                    pool.append(xml.etree.ElementTree.fromstring(item_xml))
+
+        def change_shop_removal():
+            for pool in itempools_info:
+                if pool.attrib['Name'] == 'shop':
+                    for item in pool.findall('Item'):
+                        item.attrib['DecreaseBy'] = '1'
+
         #############################
         # The main installation code
         #############################
@@ -1153,7 +1199,7 @@ class InstantStartWindow():
         self.draw_title_graphic()
 
         # If this is seeded mode, copy over the special angel rooms
-        if self.seeded_mode.get() == 1:
+        if self.seeded_mode.get() == 1 or self.seeded2_mode.get() == 1:
             # Copy the custom angel rooms
             copy_file('jud6s-extra/Ruleset 2 - Seeded/rooms/00.special rooms.stb', os.path.join(isaac_resources_directory, 'rooms/00.special rooms.stb'))
 
@@ -1216,14 +1262,16 @@ class InstantStartWindow():
             if item.tag == 'trinket' and item.attrib['name'] == 'Karma':
                 item.attrib['achievement'] = '0'
 
-        # Remove Cain's Eye from the game (done in the seeded Jud6s mod)
-        if self.seeded_mode.get() == 1:
+        # Remove Cain's Eye and Broken Remote from the game (done in the seeded Jud6s mod)
+        if self.seeded_mode.get() == 1 or self.seeded2_mode.get() == 1:
             for item in items_info:
                 if item.tag == 'trinket' and item.attrib['name'] == 'Cain\'s Eye':
                     item.attrib['achievement'] = '0'
+                if item.tag == 'trinket' and item.attrib['name'] == 'Broken Remote':
+                    item.attrib['achievement'] = '0'
 
         # Add starting items
-        if self.seeded_mode.get() == 1:
+        if self.seeded_mode.get() == 1 or self.seeded2_mode.get() == 1:
             if items:
                 items += ' + The Compass'
             else:
@@ -1285,20 +1333,81 @@ class InstantStartWindow():
                         child.set('canShoot', 'false')
 
         # Remove items from the pools
-        if self.seeded_mode.get() == 1:
+        if self.seeded_mode.get() == 1 or self.seeded2_mode.get() == 1:
+            item_list = 'Pandora\'s Box + Teleport! + Undefined + The Book of Sin'
             if removed_items:
-                removed_items += ' + Pandora\'s Box + Teleport! + Undefined + The Book of Sin'
+                removed_items += ' + ' + item_list
             else:
-                removed_items = 'Pandora\'s Box + Teleport! + Undefined + The Book of Sin'
+                removed_items = item_list
         if self.LCO_mode.get() == 1:
+            item_list = 'We Need To Go Deeper!'
             if removed_items:
-                removed_items += ' + We Need To Go Deeper!'
+                removed_items += ' + ' + item_list
             else:
-                removed_items = 'We Need To Go Deeper!'
+                removed_items = item_list
         if removed_items:
             removed_items = removed_items.split(' + ')
             for item in removed_items:
                 remove_item_from_all_item_pools(item)
+
+        # Do the changes for seeded+
+        if self.seeded2_mode.get() == 1:
+            change_shop_removal()  # Change "DecreaseBy" on everything from 0.5 to 1
+            removed_shop_items = [
+                # Active items
+                'Box Of Friends',
+                'Converter',
+                'Deck Of Cards',
+                'Glowing Hour Glass',
+                'Mom\'s Bottle Of Pills',
+                'Mom\'s Box',
+                'Pandora\'s Box',
+                'Placebo',
+                'Portable Slot',
+                'Red Candle',
+                'Remote Detonator',
+                'Tear Detonator',
+                'The Bible',
+                'The Boomerang',
+                'The Candle',
+                'The Jar',
+                'Ventricle Razor',
+                'Wooden Nickel',
+
+                # Passive Items
+                '9 Volt',
+                'Bogo Bombs',
+                'Broken Watch',
+                'Car Battery',
+                'Deep Pockets',
+                'Fanny Pack',
+                'Humbleing Bundle',
+                'Little Baggy',
+                'Mom\'s Coin Purse',
+                'Mom\'s Key',
+                'Mom\'s Purse',
+                'Night Light',
+                'PHD',
+                'Pay To Play',
+                'Piggy Bank',
+                'Spider Mod',
+                'Steam Sale',
+                'The Compass',
+                'The Ladder'
+            ]
+            for item in removed_shop_items:
+                remove_item_from_shop_pool(item)        
+
+            added_shop_items = [
+                'Steven',
+                'Blood of the Martyr',
+                'Bob\'s Brain',
+                'Speed Ball',
+                'The Sad Onion',
+                'Cupid\'s Arrow'
+            ]
+            for item in added_shop_items:
+                add_item_to_shop_pool(item)        
 
         # Set the player's health (commented out since we always want the default health)
         '''
@@ -1367,16 +1476,18 @@ class InstantStartWindow():
         title_draw.text((345, 239), jud6s_text, (134, 86, 86), font=large_font)
 
         # Draw the text that shows the options that were selected
-        if self.seeded_mode.get() == 1 or self.LCO_mode.get() == 1 or self.mega_satan_mode.get() == 1:
+        if self.seeded_mode.get() == 1 or self.seeded2_mode.get() == 1 or self.LCO_mode.get() == 1 or self.mega_satan_mode.get() == 1:
             # Create the text string
             mode_text = '('
             if self.seeded_mode.get() == 1:
-                mode_text += 'Seeded + '
+                mode_text += 'Seeded, '
+            if self.seeded2_mode.get() == 1:
+                mode_text += 'Seeded+, '
             if self.LCO_mode.get() == 1:
-                mode_text += 'LCO + '
+                mode_text += 'LCO, '
             if self.mega_satan_mode.get() == 1:
-                mode_text += 'Mega Satan + '
-            mode_text = mode_text[:-3]  # Remove the trailing " + "
+                mode_text += 'Mega Satan, '
+            mode_text = mode_text[:-2]  # Remove the trailing ", "
             mode_text += ')'
 
             # Draw the text string
@@ -1783,12 +1894,12 @@ def get_item_dict(id):
         for child in items_info:
             if child.attrib['name'].lower() == id.lower() and child.tag != 'trinket':
                 return child.attrib
-
+    return None
 
 # get_item_id - Given an item name or id, return its id
 def get_item_id(id):
     id = str(id)
-    if id.isdigit():
+    if id.isdigit():  # Applies to Odd Mushroom (thin) and Odd Mushroom (thick)
         for child in items_info:
             if child.attrib['id'] == id and child.tag != 'trinket':
                 return child.attrib['id']
@@ -1796,6 +1907,7 @@ def get_item_id(id):
         for child in items_info:
             if child.attrib['name'].lower() == id.lower() and child.tag != 'trinket':
                 return child.attrib['id']
+    error('Failed to find a corresponding item ID for "' + id + '".', None)
 
 
 # get_trinket_id - Given an item name or id, return its id
@@ -1809,6 +1921,7 @@ def get_trinket_id(id):
         for child in items_info:
             if child.attrib['name'].lower() == id.lower() and child.tag == 'trinket':
                 return child.attrib['id']
+    error('Failed to find a corresponding trinket ID for "' + id + '".', None)
 
 
 # get_item_icon - Given the name or id of an item, return its icon image
@@ -1926,7 +2039,7 @@ def main():
     window_x = int(mod_options['options']['window_x'])
     window_y = int(mod_options['options']['window_y'])
 
-    # Get the version number of the Jud6s mod specifically (which is different than the version number of Isaac Racing Mods)
+    # Get the version number of the Jud6s mod specifically (which is different than the version number of this mod)
     try:
         with open('jud6s/jud6s_version.txt', 'r') as file:
             jud6s_version = file.read()

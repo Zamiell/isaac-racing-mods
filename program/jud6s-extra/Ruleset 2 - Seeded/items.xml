@@ -448,7 +448,7 @@
 	<trinket achievement="101" description="Gulp!" gfx="trinket_001_swallowedpenny.png" id="1" name="Swallowed Penny" />
 	<trinket description="It feels lucky?" gfx="trinket_002_petrifiedpoop.png" id="2" name="Petrified Poop" />
 	<trinket description="Trickle charge" gfx="trinket_003_aaabattery.png" id="3" name="AAA Battery" />
-	<trinket description="It's broken" gfx="trinket_004_brokenremote.png" id="4" name="Broken Remote" />
+	<trinket achievement="0" description="It's broken" gfx="trinket_004_brokenremote.png" id="4" name="Broken Remote" />
 	<trinket description="Challenge up" gfx="trinket_005_purpleheart.png" id="5" name="Purple Heart" />
 	<trinket description="It kinda works" gfx="trinket_006_brokenmagnet.png" id="6" name="Broken Magnet" />
 	<trinket description="Faith up" gfx="trinket_007_rosarybead.png" id="7" name="Rosary Bead" />

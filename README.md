@@ -1,11 +1,11 @@
-# Isaac Racing Mods v3.1.1
+# Isaac Racing Mods
 ##### A collection of racing mods for The Binding of Isaac: Afterbirth
 
 <br /><br />
 
 ## Download
 
-[Download the latest version here.](https://github.com/Zamiell/isaac-racing-mods/releases/)
+[Download the latest version here.](https://github.com/Zamiell/isaac-racing-mods/releases/) (Click on the thing that says "isaac-racing-mods.zip".)
 
 <br />
 
@@ -44,6 +44,10 @@ You can find the documentation for the "Normal / Unseeded" ruleset on [the GitHu
 * Pandora's Box, Teleport!, Undefined, and Book of Sin are removed from all item pools.
 * The Cain's Eye trinket is removed from the game.
 
+#### Extra Changes in the "Seeded+" ruleset
+* The changes from the "Seeded" ruleset are included in this ruleset.
+* The [shop pool is heavily modified](https://github.com/Zamiell/isaac-racing-mods/README-seeded+.md).
+
 #### Extra Changes in the "Dark Room" ruleset
 * 4 golden chests will now spawn at the beginning of the Dark Room (instead of red chests).
 * We Need To Go Deeper! is removed from all item pools.
@@ -78,12 +82,14 @@ You can find the documentation for the "Normal / Unseeded" ruleset on [the GitHu
 * `pip install psutil`
 * `pip install pillow`
 * `cd isaac-racing-mods/program`
-* `nano ../options.ini` (set isaac_resources_directory equal to your resources directory)
+* `nano ../options.ini` (set `isaac_resources_directory` equal to your resources directory)
 * `python program.py` (`program.py` is the actual program and `isaac-racing-mods.py` is the automatic updater)
 
 <br />
 
-## Building from Source (only tested on Windows)
+## Building from Source
+
+(This is only tested on Windows.)
 
 * `python --version` (to confirm that you are using Python 3.x)
 * `pip install pyinstaller`
@@ -94,10 +100,18 @@ You can find the documentation for the "Normal / Unseeded" ruleset on [the GitHu
 
 ## Version History
 
+* *3.2.0* - June 27th
+  * The automatic updater now has the ability to update itself, instead of just the main program.
+  * Automatic updates should be twice as fast now, since the new updater is more efficient with what it downloads.
+  * Before launching the game, the program will sleep for 0.5 seconds to try and prevent the bug where the mod only gets partially installed.
+  * Added the files from the Jud6s Mod v1.27.
+  * The Broken Remote has been removed from the seeded ruleset.
+  * A new "[Seeded+](https://github.com/Zamiell/isaac-racing-mods/README-seeded+.md)" ruleset has been added to the Instant Start mod. This contains a modified shop pool in addition to all of the other changes in the normal seeded ruleset.
+  * On the Instant Start Mod, the custom starts section is now split up between custom starts with a D6 and custom starts without a D6.
 * *3.1.1* - June 5th
   * The "Don't Stop" Jud6s ruleset should work properly now.
 * *3.1.0* - June 4th
-  * Added the files for the Jud6s Mod v1.26.
+  * Added the files from the Jud6s Mod v1.26.
   * Added a 7th option to the Jud6s launcher for "Beginners", which is the ruleset used in the Basement series of tournaments.
   * Added an 8th option to the Jud6s launcher for "Don't Stop", which is the ruleset used in one of the legs of the Real Platinum Rod relay event.
   * The mod will now permanently remember the location that you put the window. It will also work properly with multiple monitors.

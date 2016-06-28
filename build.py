@@ -12,6 +12,7 @@ import configparser  # For parsing options.ini
 # Configuration
 mod_pretty_name = 'Isaac Racing Mods'
 mod_name = 'isaac-racing-mods'
+#mod_name = 'isaac-test'
 pyinstaller_path = 'C:\Python34\Scripts\pyinstaller.exe'
 
 # Get the version number of the mod from options.ini
@@ -37,12 +38,13 @@ if os.path.exists('program/__pycache__'):
 if os.path.exists('release'):
     shutil.rmtree('release')
 
-# Freeze the updater and the main program into an exe
+# Freeze the updater, the main program, and the standalone updater into an exe
 if not os.path.isfile(pyinstaller_path):
     print('Error: Edit this file and specify the path to your pyinstaller.exe file.')
     exit(1)
-subprocess.call([pyinstaller_path, '--onefile', '--windowed', '--icon=images/the_d6.ico', 'isaac-racing-mods.py'])
+subprocess.call([pyinstaller_path, '--onefile', '--windowed', '--icon=images/the_d6.ico', mod_name + '.py'])
 subprocess.call([pyinstaller_path, '--onefile', '--windowed', '--icon=images/the_d6.ico', 'program/program.py'])
+subprocess.call([pyinstaller_path, '--onefile', '--windowed', '--icon=images/the_d6.ico', mod_name + '-standalone-updater.py'])
 
 # Clean up
 shutil.rmtree('__pycache__')
@@ -72,10 +74,21 @@ shutil.move(os.path.join(install_directory, 'README.md'), os.path.join(install_d
 shutil.move(os.path.join(install_directory, 'README-diversity-mod.md'), os.path.join(install_directory, 'README-diversity-mod.txt'))
 shutil.move(os.path.join(install_directory, 'README-instant-start-mod.md'), os.path.join(install_directory, 'README-instant-start-mod.txt'))
 
+# Move the standalone updater next to where the zip files will be created
+shutil.move(os.path.join(install_directory, mod_name + '-standalone-updater.exe'), 'release')
+
 # Make the zip file
-shutil.make_archive(os.path.join('release', mod_name), 'zip', 'release', mod_name + '/')
+shutil.make_archive(os.path.join('release', mod_name), 'zip', os.path.join('release', mod_name))
+
+# Make a second zip file for people just updating the program
+for file_name in ['README.txt', 'README-diversity-mod.txt', 'README-instant-start-mod.txt']:  # Include the README files in it
+    shutil.copy(os.path.join(install_directory, file_name), os.path.join(install_directory, mod_version, file_name))
+shutil.make_archive(os.path.join('release', mod_name + '-without-updater'), 'zip', os.path.join(install_directory, mod_version))
+for file_name in ['README.txt', 'README-diversity-mod.txt', 'README-instant-start-mod.txt']:
+    os.unlink(os.path.join(install_directory, mod_version, file_name))
 
 # Clean up
 shutil.rmtree('build')
-os.unlink('isaac-racing-mods.spec')
+os.unlink(mod_name + '.spec')
 os.unlink('program.spec')
+os.unlink(mod_name + '-standalone-updater.spec')

@@ -15,8 +15,8 @@ import shutil              # For various file operations (2/2)
 import configparser        # For parsing options.ini
 import urllib.request      # For checking GitHub for the latest version
 import re                  # For parsing the options.ini file from GitHub
-import webbrowser          # For helping the user update when a new version is released
-import zipfile             # For automatically updating to the latest version
+import tempfile            # For figuring out where to put binary that updates the updater
+import zipfile             # For unzipping the downloaded latest version
 import subprocess          # For running the actual program
 import time                # For slowing down the spinning animation
 import threading           # For spawning a new thread to do the update work in (1/2)
@@ -26,6 +26,8 @@ from PIL import Image, ImageTk  # For rotating the dice
 # Configuration
 mod_pretty_name = 'Isaac Racing Mods'
 mod_name = 'isaac-racing-mods'
+#mod_name = 'isaac-test'
+repository_owner = 'Zamiell'
 
 
 ############################
@@ -114,42 +116,12 @@ def get_window_x_y(self):
         error('Failed to parse the current window\'s X and Y coordinates.', None)
 
 
-####################################
-# The classes for the popup windows
-####################################
-
-class NewUpdaterVersion():
-    def __init__(self, parent):
-        # Initialize a new GUI window
-        self.parent = parent
-        self.window = tkinter.Toplevel(self.parent)
-        self.window.withdraw()  # Hide the GUI
-        self.window.title(mod_pretty_name + ' v' + mod_version)  # Set the GUI title
-        self.window.iconbitmap('images/the_d6.ico')  # Set the GUI icon
-        self.window.resizable(False, False)
-        self.window.protocol('WM_DELETE_WINDOW', lambda: close_mod(self))
-
-        new_updater_version_message = tkinter.Message(self.window, justify=tkinter.CENTER, font='font 10', text='A new version of ' + mod_pretty_name + ' has been released.\nUnfortunately, this version cannot be automatically updated.\n(You are currently running version ' + mod_version + '.)', width=600)
-        new_updater_version_message.grid(row=0, pady=10)
-
-        hyperlink_button = tkinter.Button(self.window, font='font 12', text='Download the latest version')
-        hyperlink_button.configure(command=self.hyperlink_button_function)
-        hyperlink_button.grid(row=1, pady=10)
-
-        i_dont_care_button = tkinter.Button(self.window, font='font 12', text='I don\'t care', command=parent.quit)
-        i_dont_care_button.grid(row=2, pady=10)
-
-        # Place the window at the X and Y coordinates from either the INI or the previous window
-        self.window.deiconify()  # Show the GUI
-        self.window.geometry('+%d+%d' % (window_x, window_y))
-
-    def hyperlink_button_function(self):
-        webbrowser.open_new(r'https://github.com/Zamiell/' + mod_name + '/releases')
-        sys.exit()
-
+##################################
+# The nagging update popup window
+##################################
 
 class NewVersion():
-    def __init__(self, parent):
+    def __init__(self, parent, action):
         # Initialize a new GUI window
         self.parent = parent
         self.window = tkinter.Toplevel(self.parent)
@@ -159,9 +131,18 @@ class NewVersion():
         self.window.resizable(False, False)
         self.window.protocol('WM_DELETE_WINDOW', lambda: close_mod(self))
 
-        # "Version X.X.X has been released" message
-        new_version_message = tkinter.Message(self.window, justify=tkinter.CENTER, font='font 10', text='Version ' + latest_version + ' of ' + mod_pretty_name + ' has been released.\n(You are currently running version ' + mod_version + '.)', width=600)
-        new_version_message.grid(row=0, pady=10)
+        # Store the action for later and show the appropriate update message
+        self.action = action
+        if self.action == 'update_updater':
+            # "A new version" message
+            new_version_message = tkinter.Message(self.window, justify=tkinter.CENTER, font='font 10', text='A new version of ' + mod_pretty_name + ' has been released.', width=600)
+            new_version_message.grid(row=0, pady=10)
+        elif self.action == 'update_mod':
+            # "Version X.X.X has been released" message
+            new_version_message = tkinter.Message(self.window, justify=tkinter.CENTER, font='font 10', text='Version ' + latest_version + ' of ' + mod_pretty_name + ' has been released.\n(You are currently running version ' + mod_version + '.)', width=600)
+            new_version_message.grid(row=0, pady=10)
+        else:
+            error('The "NewVersion" class was called without a valid action.', None)
 
         # "Automatically update and launch the new version" button
         update_button = tkinter.Button(self.window, font='font 12', text='Automatically update and launch the new version')
@@ -210,7 +191,7 @@ class NewVersion():
     def start_update(self):
         self.thread_potentially_failed = False
         self.queue = queue.Queue()
-        self.updater_task = UpdaterTask(self.queue)
+        self.updater_task = UpdaterTask(self.queue, self.action)
         self.updater_task.start()
         self.parent.after(50, self.process_queue)
 
@@ -221,9 +202,6 @@ class NewVersion():
 
         # Rotate the dice
         self.rotate_dice()
-
-        # Let new things happen in GUI land
-        #self.window.update_idletasks()
 
         try:
             # Poll to see if the updating thread is finished its work yet
@@ -236,20 +214,32 @@ class NewVersion():
             elif message != 'Task finished':
                 error('Got an unknown message from updater task.', None)
 
-            # It has finished, so update options.ini with the new version
-            global mod_version
-            global mod_options
+            # It has finished
+            if self.action == 'update_updater':
+                # Check to see if the program exists
+                updater_exe_name = mod_name + '-standalone-updater.exe'
+                updater_exe_path = os.path.join(tempfile.gettempdir(), updater_exe_name)
+                if not os.path.isfile(updater_exe_path):
+                    error('The updater was supposed to be downloaded to "' + updater_exe_path + '", but that file does not exist.\nPlease redownload the program manually.', None)
 
-            mod_version = latest_version
-            mod_options['options']['mod_version'] = mod_version
-            try:
-                with open('options.ini', 'w') as config_file:
-                    mod_options.write(config_file)
-            except Exception as e:
-                error('Failed to write the new version to the "options.ini" file:', e)
+                # Open the updater
+                subprocess.Popen([updater_exe_path, os.path.dirname(os.path.realpath(__file__))])  # Pass the argument of the current directory
+                sys.exit()
 
-            # Close the GUI and proceed with launching the program
-            self.parent.quit()
+            elif self.action == 'update_mod':
+                # Update options.ini with the new version
+                mod_version = latest_version
+                mod_options['options']['mod_version'] = mod_version
+                try:
+                    with open('options.ini', 'w') as config_file:
+                        mod_options.write(config_file)
+                except Exception as e:
+                    error('Failed to write the new version to the "options.ini" file:', e)
+
+                # Close the GUI and proceed with launching the program
+                self.parent.quit()
+            else:
+                error('The "UpdaterTask" class finished without a valid action.', None)
 
         except queue.Empty:
             if self.updater_task.is_alive() == True:
@@ -272,72 +262,85 @@ class NewVersion():
         self.d6 = self.canvas.create_image(50, 35, image=self.rotated_d6)
 
 
+###############################################
+# The updater task that actually does the work
+###############################################
+
 class UpdaterTask(threading.Thread):
-    def __init__(self, queue):
+    def __init__(self, queue, action):
         threading.Thread.__init__(self)
         self.queue = queue
+        self.action = action
 
     def run(self):
+        if self.action == 'update_updater':
+            self.run_update_updater()
+        elif self.action == 'update_mod':
+            self.run_update_mod()
+        else:
+            self.error('The UpdaterTask class was passed an invalid action.', None)
+
+    def run_update_updater(self):
+        # Check to see if the updater exe file already exists
+        updater_exe_name = mod_name + '-standalone-updater.exe'
+        updater_exe_path = os.path.join(tempfile.gettempdir(), updater_exe_name)
+        self.delete_file_if_exists(updater_exe_path)
+
+        # Download the updater exe file
+        try:
+            url = 'https://github.com/' + repository_owner + '/' + mod_name + '/releases/download/' + latest_version + '/' + updater_exe_name
+            urllib.request.urlretrieve(url, updater_exe_path)
+        except Exception as e:
+            self.error('Failed to download the self-updater from GitHub:', e)
+
+        # Signal that the update is completed
+        self.queue.put('Task finished')
+        sys.exit()  # This will only terminate the existing thread
+
+    def run_update_mod(self):
         # Check to see if the zip file already exists
-        self.delete_file_if_exists(mod_name + '.zip')
+        mod_zip_name = mod_name + '-without-updater.zip'
+        self.delete_file_if_exists(mod_zip_name)
 
         # Download the zip file
         try:
-            url = 'https://github.com/Zamiell/' + mod_name + '/releases/download/' + latest_version + '/' + mod_name + '.zip'
-            urllib.request.urlretrieve(url, mod_name + '.zip')
+            url = 'https://github.com/' + repository_owner + '/' + mod_name + '/releases/download/' + latest_version + '/' + mod_zip_name
+            urllib.request.urlretrieve(url, mod_zip_name)
         except Exception as e:
             self.error('Failed to download the latest version from GitHub:', e)
 
-        # Define the name of the temporary directory
-        temp_directory = 'temp'
-
-        # Check to see if the temporary directory exists
-        self.delete_file_if_exists(temp_directory)
-
-        # Create the temporary directory
-        if os.path.exists(temp_directory):
-            self.error('Failed to create the "' + temp_directory + '" directory, as a file or folder already exists by that name.', None)
-        try:
-            os.makedirs(temp_directory)
-        except Exception as e:
-            self.error('Failed to create the "' + temp_directory + '" directory:', sys.exc_info())
-
-        # Extract the zip file to the temporary directory
-        try:
-            with zipfile.ZipFile(mod_name + '.zip', 'r') as z:
-                z.extractall(temp_directory)
-        except Exception as e:
-            self.error('Failed to extract the downloaded "' + mod_name + '.zip" file:', e)
-
-        # Delete the zip file
-        self.delete_file_if_exists(mod_name + '.zip')
-
-        # Check to see if the directory corresponding to the latest version already exists
+        # Check to see if a directory corresponding to the latest version already exists
         self.delete_file_if_exists(latest_version)
 
-        # Check to see if the "program" directory exists
-        if not os.path.isdir(os.path.join(temp_directory, mod_name, latest_version)):
-            self.error('There was not a "' + latest_version + '" directory in the downloaded zip file, so I don\'t know how to install it.\nTry downloading the latest version manually.', None)
+        # Create the new directory for the new version
+        if os.path.exists(latest_version):
+            self.error('I can\'t create the "' + latest_version + '" directory, as a file or folder already exists by that name.', None)
+        try:
+            os.makedirs(latest_version)
+        except Exception as e:
+            self.error('Failed to create the "' + latest_version + '" directory:', e)
+
+        # Extract the zip file to the new directory
+        try:
+            with zipfile.ZipFile(mod_zip_name, 'r') as z:
+                z.extractall(latest_version)
+        except Exception as e:
+            self.error('Failed to extract the downloaded "' + mod_zip_name + '" file:', e)
+
+        # Delete the zip file
+        self.delete_file_if_exists(mod_zip_name)
 
         # Check to see if "program.exe" exists (not strictly necessary but it is a sanity check)
-        if not os.path.isfile(os.path.join(temp_directory, mod_name, latest_version, 'program.exe')):
-            self.error('There was not a "program.exe" file in the downloaded zip file, so I don\'t know how to install it.\nTry downloading the latest version manually.', None)
-
-        # Move the version number (program) directory up two directories
-        try:
-            shutil.move(os.path.join(temp_directory, mod_name, latest_version), latest_version)
-        except Exception as e:
-            self.error('Failed to move the "program" directory:', e)
+        if not os.path.isfile(os.path.join(latest_version, 'program.exe')):
+            self.error('There was not a "program.exe" file in the downloaded zip file, so something went wrong.\nTry downloading the latest version manually.', None)
 
         # Copy the 3 README files
         for file_name in ['README.txt', 'README-diversity-mod.txt', 'README-instant-start-mod.txt']:
-            if not os.path.isfile(os.path.join(temp_directory, mod_name, file_name)):
-                self.error('There was not a "' + file_name + '" file in the downloaded zip file, so I can\'t copy it over.\nTry downloading the latest version manually.', None)
+            if not os.path.isfile(os.path.join(latest_version, file_name)):
+                self.error('There was not a "' + file_name + '" file in the downloaded zip file, so something went wrong.\nTry downloading the latest version manually.', None)
             self.delete_file_if_exists(file_name);
-            self.copy_file(os.path.join(temp_directory, mod_name, file_name), file_name)
-
-        # Delete the temporary directory
-        self.delete_file_if_exists(temp_directory)
+            self.copy_file(os.path.join(latest_version, file_name), file_name)
+            self.delete_file_if_exists(os.path.join(latest_version, file_name))
 
         # Delete the directory with the old version
         self.delete_file_if_exists(mod_version)
@@ -383,7 +386,7 @@ class UpdaterTask(threading.Thread):
         sys.exit()
 
 def close_mod(self):
-    # Write the new path to the INI file
+    # Write the current window coordinates to the INI file
     get_window_x_y(self)
     mod_options.set('options', 'window_x', str(window_x))
     mod_options.set('options', 'window_y', str(window_y))
@@ -446,7 +449,7 @@ def main():
 
     # Check to see what the latest version of the mod is
     try:
-        url = 'https://raw.githubusercontent.com/Zamiell/' + mod_name + '/master/options.ini'
+        url = 'https://raw.githubusercontent.com/' + repository_owner + '/' + mod_name + '/master/options.ini'
         master_options_ini = urllib.request.urlopen(url).read().decode('utf8')
 
         # Get the mod version
@@ -474,14 +477,14 @@ def main():
         latest_version = mod_version
         latest_updater_version = mod_updater_version
         
-    # There is a new version of the updater, which cannot be automatically downloaded, so alert the user
+    # There is a new version of the updater, so ask the user if they want to automatically update
     if mod_updater_version != latest_updater_version:
-        NewUpdaterVersion(root)
+        NewVersion(root, 'update_updater')
         root.mainloop()
 
     # There is a new version of the mod, so ask the user if they want to automatically update
     elif mod_version != latest_version:
-        NewVersion(root)
+        NewVersion(root, 'update_mod')
         root.mainloop()
 
     #####################################
