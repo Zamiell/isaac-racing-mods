@@ -46,7 +46,7 @@ You can find the documentation for the "Normal / Unseeded" ruleset on [the GitHu
 
 #### Extra Changes in the "Seeded+" ruleset
 * The changes from the "Seeded" ruleset are included in this ruleset.
-* The [shop pool is heavily modified](https://github.com/Zamiell/isaac-racing-mods/README-seeded+.md).
+* The [shop pool is heavily modified](https://github.com/Zamiell/isaac-racing-mods/blob/master/README-seeded+.md).
 
 #### Extra Changes in the "Dark Room" ruleset
 * 4 golden chests will now spawn at the beginning of the Dark Room (instead of red chests).
