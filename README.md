@@ -13,8 +13,8 @@
 
 This is a program that contains the 3 racing mods:
 * [The Jud6s Mod](https://github.com/Zamiell/jud6s)
-* [Instant Start Mod](https://github.com/Zamiell/isaac-racing-mods/README-instant-start-mod.md)
-* [Diversity Mod](https://github.com/Zamiell/isaac-racing-mods/README-diversity-mod.md)
+* [Instant Start Mod](https://github.com/Zamiell/isaac-racing-mods/blob/master/README-instant-start-mod.md)
+* [Diversity Mod](https://github.com/Zamiell/isaac-racing-mods/blob/master/README-diversity-mod.md)
 
 It will also automatically keep everything up to date so that you don't have to be bothered downloading the latest versions over and over.
 
@@ -106,7 +106,7 @@ You can find the documentation for the "Normal / Unseeded" ruleset on [the GitHu
   * Before launching the game, the program will sleep for 0.5 seconds to try and prevent the bug where the mod only gets partially installed.
   * Added the files from the Jud6s Mod v1.27.
   * The Broken Remote has been removed from the seeded ruleset.
-  * A new "[Seeded+](https://github.com/Zamiell/isaac-racing-mods/README-seeded+.md)" ruleset has been added to the Instant Start mod. This contains a modified shop pool in addition to all of the other changes in the normal seeded ruleset.
+  * A new "[Seeded+](https://github.com/Zamiell/isaac-racing-mods/blob/master/README-seeded+.md)" ruleset has been added to the Instant Start mod. This contains a modified shop pool in addition to all of the other changes in the normal seeded ruleset.
   * On the Instant Start Mod, the custom starts section is now split up between custom starts with a D6 and custom starts without a D6.
 * *3.1.1* - June 5th
   * The "Don't Stop" Jud6s ruleset should work properly now.
