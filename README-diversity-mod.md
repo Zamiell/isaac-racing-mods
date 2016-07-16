@@ -67,7 +67,7 @@ One of the goals of Diversity Mod is to force the player to play with non-standa
 
 Note that it is still possible to start with these items as one of the 3 passive items.
 
-Furthermore, certain items allow you to re-roll your build. Again, this spoils the fun, as the intent is to force the player to play with non-standard items. Thus, the following items are removed from all item pools:
+Furthermore, certain activated items allow you to re-roll your build. Again, this spoils the fun, as the intent is to force the player to play with non-standard items. Thus, the following items are removed from all item pools:
 
 * D4
 * D100
