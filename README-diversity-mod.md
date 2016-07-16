@@ -15,20 +15,19 @@ Diversity Mod is a mod that gives the D6 and 3 random passive items to all chara
 
 <br />
 
-## Exact Changes
+## Mod Changes
 
 * All characters start with the D6 (except for Eve, Eden, and Keeper, as it isn't possible).
 * All characters start with the same 3 additional random passive items, keeping their original passive items and resources.
-* Mom's Knife, Epic Fetus, and Tech X are removed from all item pools. It is still possible to start with them as one of the 3 passive items.
-* D4 and D100 are removed from all item pools.
-* All special items are no longer special.
+* All special items are no longer special (to promote item diversity).
+* Some items are remoevd from all pools; see below.
 * Room modifications, animations, and bug fixes are taken from [the Jud6s mod](https://github.com/Zamiell/jud6s).
 
 <br />
 
 ## Excluded Starting Items
 
-Besides not being able to start with two of the same item, it is not possible to start with the following items:
+Some items hardly have an effect on the playstyle of the run. Thus, it is not possible to start with the following items:
 
 * 15 - <3
 * 16 - Raw Liver
@@ -58,7 +57,26 @@ Besides not being able to start with two of the same item, it is not possible to
 
 <br />
 
-## Item Pool Bans
+## Item Bans
+
+One of the goals of Diversity Mod is to force the player to play with non-standard items (such as Tiny Planet, for example). However, certain powerful items simply override tear effects, spoiling the fun. Thus, the following items are removed from all item pools:
+
+* Mom's Knife
+* Epic Fetus
+* Tech X
+
+Note that it is still possible to start with these items as one of the 3 passive items.
+
+Furthermore, certain items allow you to re-roll your build. Again, this spoils the fun, as the intent is to force the player to play with non-standard items. Thus, the following items are removed from all item pools:
+
+* D4
+* D100
+
+<br />
+
+## Item Synergy Bans
+
+In the context of a 1v1 match, certain item synergies are so powerful that they result in a "free" win most of the time. Thus, certain synergies are banned to make the mod more competitive in tournament play.
 
 * If starting Soy Milk or Libra, Soy Milk and Libra are removed from all pools.
 * If starting Isaac's Heart, Blood Rights are removed from all pools.
