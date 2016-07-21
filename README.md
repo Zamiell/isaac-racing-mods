@@ -100,6 +100,12 @@ You can find the documentation for the "Normal / Unseeded" ruleset on [the GitHu
 
 ## Version History
 
+* *3.2.1* - July 21st
+  * Diversity Mod will now automatically capitalize the seed you enter.
+  * Diversity Mod has some item synergy bans removed:
+    * Tammy's Head is unbanned on Brimstone starts.
+    * Monstro's Lung and Chocolate Milk are unbanned on Monstro's Lung and Chocolate Milk starts.
+    * Ipecac is unbanned on Technology 2 starts.
 * *3.2.0* - June 27th
   * The automatic updater now has the ability to update itself, instead of just the main program.
   * Automatic updates should be twice as fast now, since the new updater is more efficient with what it downloads.

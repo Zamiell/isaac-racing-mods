@@ -1562,6 +1562,9 @@ class DiversityWindow():
             else:
                 self.seed_was_randomly_selected = False
 
+            # Set everything to upper case
+            self.entry_box_contents.set(self.entry_box_contents.get().upper())
+
         # Seed entry box
         self.entry_box_contents = tkinter.StringVar()
         self.entry_box_contents.trace('w', check_seed_installed)
@@ -1788,25 +1791,11 @@ class DiversityWindow():
             if 'Blood Rights' not in items and 'Blood Rights' not in removed_items:
                 removed_items.append('Blood Rights')
 
-        if 'Brimstone' in items:
-            if 'Tammy\'s Head' not in items and 'Tammy\'s Head' not in removed_items:
-                removed_items.append('Tammy\'s Head')
-
-        if 'Monstro\'s Lung' in items or 'Chocolate Milk' in items:
-            if 'Monstro\'s Lung' not in items and 'Monstro\'s Lung' not in removed_items:
-                removed_items.append('Monstro\'s Lung')
-            if 'Chocolate Milk' not in items and 'Chocolate Milk' not in removed_items:
-                removed_items.append('Chocolate Milk')
-
         if 'Ipecac' in items or 'Dr. Fetus' in items:
             if 'Ipecac' not in items and 'Ipecac' not in removed_items:
                 removed_items.append('Ipecac')
             if 'Dr. Fetus' not in items and 'Dr. Fetus' not in removed_items:
                 removed_items.append('Dr. Fetus')
-
-        if 'Technology 2' in items:
-            if 'Ipecac' not in items and 'Ipecac' not in removed_items:
-                removed_items.append('Ipecac')
 
         if 'Monstro\'s Lung' in items:
             if 'Ipecac' not in items and 'Ipecac' not in removed_items:

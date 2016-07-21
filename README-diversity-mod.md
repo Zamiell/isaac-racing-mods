@@ -80,10 +80,7 @@ In the context of a 1v1 match, certain item synergies are so powerful that they 
 
 * If starting Soy Milk or Libra, Soy Milk and Libra are removed from all pools.
 * If starting Isaac's Heart, Blood Rights are removed from all pools.
-* If starting Brimstone, Tammy's Head is removed from all pools.
-* If starting Monstro's Lung or Chocolate Milk, Monstro's Lung and Chocolate Milk are removed from all pools.
 * If starting Ipecac or Dr. Fetus, Ipecac and Dr. Fetus are removed from all pools.
-* If starting Technology 2, Ipecac is removed from all pools.
 * If starting Monstro's Lung, Ipecac is removed from all pools.
 
 <br />
