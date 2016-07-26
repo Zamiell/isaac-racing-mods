@@ -100,6 +100,10 @@ You can find the documentation for the "Normal / Unseeded" ruleset on [the GitHu
 
 ## Version History
 
+* *3.2.2* - July 26th
+  * Added the files from the Jud6s Mod v1.28.
+  * The Diversity Mod items are now also given to Keeper.
+  * "isaac-racing-mods-without-updater.zip" is renamed to "isaac-racing-mods-patch-package.zip" to prevent confusion with new users.
 * *3.2.1* - July 21st
   * Diversity Mod will now automatically capitalize the seed you enter.
   * Diversity Mod has some item synergy bans removed:

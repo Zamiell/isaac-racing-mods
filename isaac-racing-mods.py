@@ -299,7 +299,7 @@ class UpdaterTask(threading.Thread):
 
     def run_update_mod(self):
         # Check to see if the zip file already exists
-        mod_zip_name = mod_name + '-without-updater.zip'
+        mod_zip_name = mod_name + '-patch-package.zip'
         self.delete_file_if_exists(mod_zip_name)
 
         # Download the zip file

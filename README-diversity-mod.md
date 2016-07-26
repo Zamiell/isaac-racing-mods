@@ -18,7 +18,7 @@ Diversity Mod is a mod that gives the D6 and 3 random passive items to all chara
 ## Mod Changes
 
 * All characters start with the D6 (except for Eve, Eden, and Keeper, as it isn't possible).
-* All characters start with the same 3 additional random passive items, keeping their original passive items and resources (except for Keeper, as it isn't possible).
+* All characters start with the same 3 additional random passive items, keeping their original passive items and resources.
 * All special items are no longer special (to promote item diversity).
 * Some items are remoevd from all pools; see below.
 * Room modifications, animations, and bug fixes are taken from [the Jud6s mod](https://github.com/Zamiell/jud6s).

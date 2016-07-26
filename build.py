@@ -83,7 +83,7 @@ shutil.make_archive(os.path.join('release', mod_name), 'zip', os.path.join('rele
 # Make a second zip file for people just updating the program
 for file_name in ['README.txt', 'README-diversity-mod.txt', 'README-instant-start-mod.txt']:  # Include the README files in it
     shutil.copy(os.path.join(install_directory, file_name), os.path.join(install_directory, mod_version, file_name))
-shutil.make_archive(os.path.join('release', mod_name + '-without-updater'), 'zip', os.path.join(install_directory, mod_version))
+shutil.make_archive(os.path.join('release', mod_name + '-patch-package'), 'zip', os.path.join(install_directory, mod_version))
 for file_name in ['README.txt', 'README-diversity-mod.txt', 'README-instant-start-mod.txt']:
     os.unlink(os.path.join(install_directory, mod_version, file_name))
 

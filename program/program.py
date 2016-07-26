@@ -1757,7 +1757,7 @@ class DiversityWindow():
                 del item.attrib['special']
 
         # Add the 3 random items to every character
-        characters_to_skip = ['Lazarus II', 'Black Judas', 'Keeper']  # The game crashes if you try to give Keeper items
+        characters_to_skip = ['Lazarus II', 'Black Judas']
         for character in players_info:
             if character.attrib['name'] in characters_to_skip:
                 continue
