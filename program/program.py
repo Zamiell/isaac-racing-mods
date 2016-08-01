@@ -463,15 +463,25 @@ class Jud6sWindow():
         ruleset7_button.icon = ImageTk.PhotoImage(get_item_icon('The Belt'))
         ruleset7_button.configure(image=ruleset7_button.icon)
         ruleset7_button.grid(row=row, pady=5)
-        self.window.bind('7', lambda event: ruleset5_button.invoke())
+        self.window.bind('7', lambda event: ruleset7_button.invoke())
+        row += 1
+
+        # 8 - "Pageant Boy" button
+        ruleset8_button = tkinter.Button(self.window, text=' Pageant Boy (8) ', compound='left', width=375)
+        ruleset8_button.configure(font=('Helvetica', 13, 'bold'))
+        ruleset8_button.configure(command=lambda: self.install_jud6s_mod(8))
+        ruleset8_button.icon = ImageTk.PhotoImage(get_item_icon('Pageant Boy'))
+        ruleset8_button.configure(image=ruleset8_button.icon)
+        ruleset8_button.grid(row=row, pady=5)
+        self.window.bind('8', lambda event: ruleset8_button.invoke())
         row += 1
 
         # "Go Back" button
-        go_back_button = tkinter.Button(self.window, text=' Go Back (8) ', compound='left')
+        go_back_button = tkinter.Button(self.window, text=' Go Back (9) ', compound='left')
         go_back_button.configure(font=('Helvetica', 13))
         go_back_button.configure(command=self.go_back)
         go_back_button.grid(row=row, pady=25)
-        self.window.bind('8', lambda event: go_back_button.invoke())
+        self.window.bind('9', lambda event: go_back_button.invoke())
         row += 1
 
         # Instructions
@@ -597,6 +607,17 @@ class Jud6sWindow():
             copy_file('jud6s-extra/' + ruleset_name + '/rooms/00.special rooms.stb', os.path.join(isaac_resources_directory, 'rooms/00.special rooms.stb'))
             copy_file('jud6s-extra/' + ruleset_name + '/rooms/16.dark room.stb', os.path.join(isaac_resources_directory, 'rooms/16.dark room.stb'))
             copy_file('jud6s-extra/' + ruleset_name + '/rooms/17.chest.stb', os.path.join(isaac_resources_directory, 'rooms/17.chest.stb'))
+
+        # 8 - Pageant Boy
+        elif ruleset == 8:
+            # Define the ruleset name
+            ruleset_name = 'Ruleset 8 - Pageant Boy'
+
+            # The custom starting items
+            copy_file('jud6s-extra/' + ruleset_name + '/players.xml', os.path.join(isaac_resources_directory, 'players.xml'))
+            
+            # The ruleset name is too long for the title screen, so make it shorter
+            ruleset_name = 'Pageant Boy Tourny'
 
         # Draw a title screen and save it overtop the old title screen
         if ruleset != 1:

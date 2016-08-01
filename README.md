@@ -67,6 +67,9 @@ You can find the documentation for the "Normal / Unseeded" ruleset on [the GitHu
 #### Extra Changes in the "Don't Stop" ruleset
 * A soul heart appears at the beginning of every floor.
 
+#### Extra Changes in the "Pageant Boy" ruleset
+* Judas starts with Cricket's Head, There's Options, and More Options in addition to the D6.
+
 <br />
 
 ## Known Issues
@@ -100,6 +103,8 @@ You can find the documentation for the "Normal / Unseeded" ruleset on [the GitHu
 
 ## Version History
 
+* *3.2.3* - August 1st
+  * The "Pageant Boy" ruleset has been added to the choices in the Jud6s Mod menu to accomodate the upcoming tournament.
 * *3.2.2* - July 26th
   * Added the files from the Jud6s Mod v1.28.
   * The Diversity Mod items are now also given to Keeper.
