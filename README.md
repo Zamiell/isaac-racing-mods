@@ -104,7 +104,7 @@ You can find the documentation for the "Normal / Unseeded" ruleset on [the GitHu
 ## Version History
 
 * *3.2.3* - August 1st
-  * The "Pageant Boy" ruleset has been added to the choices in the Jud6s Mod menu to accomodate the upcoming tournament.
+  * The "Pageant Boy" ruleset has been added to the choices in the Jud6s Mod menu to accommodate the upcoming tournament.
 * *3.2.2* - July 26th
   * Added the files from the Jud6s Mod v1.28.
   * The Diversity Mod items are now also given to Keeper.
