@@ -1305,32 +1305,37 @@ class InstantStartWindow():
         if items or trinket:
             if items:
                 items = items.split(' + ')
-            for child in players_info:
-                # These are the 10 characters that can receive the D6
-                characterList = ['Isaac', 'Magdalene', 'Cain', 'Judas', '???', 'Samson', 'Azazel', 'Lazarus', 'The Lost', 'Lilith']
+            for character in players_info:
+                # These are all of the 13 characters
+                characterList = ['Isaac', 'Magdalene', 'Cain', 'Judas', '???', 'Eve', 'Samson', 'Azazel', 'Lazarus', 'Eden', 'The Lost', 'Lilith', 'Keeper']
 
-                # Go through the 10 characters
-                if child.attrib['name'] in characterList:
+                # Go through the 13 characters
+                if character.attrib['name'] in characterList:
                     # Set starting health (currently only done in LCO mode)
                     if self.LCO_mode.get() == 1:
-                        child.set('hp', '0')
-                        child.set('armor', '0')
+                        character.set('hp', '0')
+                        character.set('armor', '0')
 
                     # Set a trinket
                     if trinket:
-                        child.set('trinket', get_trinket_id(trinket))
+                        character.set('trinket', get_trinket_id(trinket))
 
                     # Set the item(s)
                     if items:
                         for i in range(0, len(items)):
                             items[i] = get_item_id(items[i])
 
+                        # Give them an "items" attribute if they don't already have it
+                        if 'items' not in character.attrib.keys():  # Necessary for Eden
+                            character.attrib['items'] = ''
+
                         # Add the items to the player.xml
                         for item in items:
                             id = get_item_id(item)
-                            if child.attrib['items'] != '':
-                                child.attrib['items'] += ','
-                            child.attrib['items'] += id
+
+                            if character.attrib['items'] != '':
+                                character.attrib['items'] += ','
+                            character.attrib['items'] += id
 
                         # Remove soul hearts and black hearts from items in items.xml (normal health ups are okay)
                         for item in items_info:
@@ -1341,17 +1346,29 @@ class InstantStartWindow():
 
                     # Set pickups
                     if coins:
-                        child.set('coins', coins)
+                        character.set('coins', coins)
                     if bombs:
-                        child.set('bombs', bombs)
+                        character.set('bombs', bombs)
                     if keys:
-                        child.set('keys', keys)
+                        character.set('keys', keys)
                     if card:
-                        child.set('card', card)
+                        character.set('card', card)
 
                     # Set blindfolded
                     if blindfolded:
-                        child.set('canShoot', 'false')
+                        character.set('canShoot', 'false')
+
+        # Set the player's health (commented out since we always want the default health)
+        '''
+        for item in items_info:
+            if item.attrib['name'] == 'The D6':
+                item.set('hearts', redhearts)
+                item.set('maxhearts', str(int(redhearts) + (int(redhearts) % 2) + (int(heartcontainers) if heartcontainers else 0)))
+                if soulhearts:
+                    item.set('soulhearts', soulhearts)
+                if blackhearts:
+                    item.set('blackhearts', blackhearts)
+        '''
 
         # Remove items from the pools
         if self.seeded_mode.get() == 1 or self.seeded2_mode.get() == 1:
@@ -1429,18 +1446,6 @@ class InstantStartWindow():
             ]
             for item in added_shop_items:
                 add_item_to_shop_pool(item)        
-
-        # Set the player's health (commented out since we always want the default health)
-        '''
-        for child in items_info:
-            if child.attrib['name'] == 'The D6':
-                child.set('hearts', redhearts)
-                child.set('maxhearts', str(int(redhearts) + (int(redhearts) % 2) + (int(heartcontainers) if heartcontainers else 0)))
-                if soulhearts:
-                    child.set('soulhearts', soulhearts)
-                if blackhearts:
-                    child.set('blackhearts', blackhearts)
-        '''
 
         # Write the changes to the copied over XML files
         players_xml.write(os.path.join(isaac_resources_directory, 'players.xml'))
