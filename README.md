@@ -103,8 +103,10 @@ You can find the documentation for the "Normal / Unseeded" ruleset on [the GitHu
 
 ## Version History
 
+* *3.2.5* - August 20th
+  * Added the files from the Jud6s Mod v1.30.
 * *3.2.4* - August 19th
-  * Added the files from the Jud6s Mod v1.28.
+  * Added the files from the Jud6s Mod v1.29.
   * Fixed the Instant Start Mod to also give the instant start item to Eve, Eden, and Keeper.
 * *3.2.3* - August 1st
   * The "Pageant Boy" ruleset has been added to the choices in the Jud6s Mod menu to accommodate the upcoming tournament.
