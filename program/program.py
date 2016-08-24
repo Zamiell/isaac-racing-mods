@@ -1894,6 +1894,11 @@ def get_image(path):
     if image is None:
         canonicalized_path = path.replace('/', os.sep).replace('\\', os.sep)
         image = Image.open(canonicalized_path)
+        
+        # Crop the image to 32x32 (A Dollar, A Quarter, and Money = Power have hidden text outside of the 32x32)
+        image = image.crop((0, 0, 32, 32))
+
+        # Add the image to the library so that we don't have to load it again in the future
         raw_image_library[path] = image
     return image
 

@@ -103,6 +103,8 @@ You can find the documentation for the "Normal / Unseeded" ruleset on [the GitHu
 
 ## Version History
 
+* *3.2.6* - August 21st
+  * Fixed the Diversity Mod display bug with A Dollar, A Quarter, and Money = Power in the starting room.
 * *3.2.5* - August 20th
   * Added the files from the Jud6s Mod v1.30.
 * *3.2.4* - August 19th
