@@ -103,6 +103,12 @@ You can find the documentation for the "Normal / Unseeded" ruleset on [the GitHu
 
 ## Version History
 
+* *3.3.0* - August 25th
+  * Added an "Exit" button to the main menu.
+  * Added a "Miscellaneous Stuff" button to the main menu that contains 3 new features:
+    * A button to open the Isaac game directory.
+    * A button to open the Isaac directory in "Documents".
+    * A button to remove all currently installed mods.
 * *3.2.6* - August 21st
   * Fixed the Diversity Mod display bug with A Dollar, A Quarter, and Money = Power in the starting room.
 * *3.2.5* - August 20th

@@ -353,6 +353,25 @@ class ModSelectionWindow():
         spacing.grid(row=row)
         row += 1
 
+        # "Miscellaneous Stuff" button
+        miscellaneous_button = tkinter.Button(self.window, text=' Miscellaneous Stuff (4) ', compound='left', font='font 15')
+        miscellaneous_button.configure(command=self.show_miscellaneous_window)
+        miscellaneous_button.grid(row=row, pady=5)
+        self.window.bind('4', lambda event: miscellaneous_button.invoke())
+        row += 1
+
+        # "Exit" button
+        exit_button = tkinter.Button(self.window, text=' Exit (5) ', compound='left', font='font 15')
+        exit_button.configure(command=self.exit)
+        exit_button.grid(row=row, pady=5)
+        self.window.bind('5', lambda event: uninstall_mod(self))  # Won't work with "exit_button.invoke()"
+        row += 1
+
+        # Spacing
+        spacing = tkinter.Message(self.window, text='', font='font 6')
+        spacing.grid(row=row)
+        row += 1
+
         # Place the window at the X and Y coordinates from either the INI or the previous window
         self.window.deiconify()  # Show the GUI
         self.window.geometry('+%d+%d' % (window_x, window_y))
@@ -371,6 +390,15 @@ class ModSelectionWindow():
         get_window_x_y(self)
         self.window.destroy()
         DiversityWindow(self.parent)
+
+    def show_miscellaneous_window(self):
+        get_window_x_y(self)
+        self.window.destroy()
+        MiscellaneousWindow(self.parent)
+
+    def exit(self):
+        get_window_x_y(self)
+        uninstall_mod(self)
 
 
 #######################
@@ -1851,9 +1879,94 @@ class DiversityWindow():
         ModSelectionWindow(self.parent)
 
 
-#####################################
+###########################
+# The miscellaneous window
+###########################
+
+class MiscellaneousWindow():
+    def __init__(self, parent):
+        # Initialize a new GUI window
+        self.parent = parent
+        self.window = tkinter.Toplevel(self.parent)
+        self.window.withdraw()  # Hide the GUI
+        self.window.title(mod_pretty_name + ' v' + mod_version)  # Set the GUI title
+        self.window.iconbitmap('images/icons/the_d6.ico')  # Set the GUI icon
+        self.window.resizable(False, False)
+        self.window.protocol('WM_DELETE_WINDOW', lambda: uninstall_mod(self))  # Uninstall mod files when the window is closed
+
+        # Start counting rows
+        row = 0
+
+        # Miscellaneous Stuff
+        select_message = tkinter.Message(self.window, justify=tkinter.CENTER, text='Select an option:', font='font 20', width=400)
+        select_message.grid(row=row, pady=5, padx=100)  # Widen the window
+        row += 1
+
+        # "Open Isaac game directory" button
+        open1_button = tkinter.Button(self.window, text=' Open Isaac game directory (1) ', compound='left')
+        open1_button.configure(font=('Helvetica', 13, 'bold'))
+        open1_button.configure(command=self.open1)
+        open1_button.grid(row=row, pady=5)
+        self.window.bind('1', lambda event: self.open1())
+        row += 1
+
+        # "Open Isaac documents directory" button
+        open2_button = tkinter.Button(self.window, text=' Open Isaac documents directory (2) ', compound='left')
+        open2_button.configure(font=('Helvetica', 13, 'bold'))
+        open2_button.configure(command=self.open2)
+        open2_button.grid(row=row, pady=5)
+        self.window.bind('2', lambda event: self.open2())
+        row += 1
+
+        # "Uninstall all existing mods" button
+        uninstall_button = tkinter.Button(self.window, text=' Uninstall all existing mods (3) ', compound='left')
+        uninstall_button.configure(font=('Helvetica', 13, 'bold'))
+        uninstall_button.configure(command=self.uninstall_all)
+        uninstall_button.grid(row=row, pady=5)
+        self.window.bind('3', lambda event: self.uninstall_all())
+        row += 1
+
+        # "Go Back" button
+        go_back_button = tkinter.Button(self.window, text=' Go Back (4) ', compound='left')
+        go_back_button.configure(font=('Helvetica', 13))
+        go_back_button.configure(command=self.go_back)
+        go_back_button.grid(row=row, pady=25)
+        self.window.bind('4', lambda event: go_back_button.invoke())
+        row += 1
+
+        # Spacing
+        spacing = tkinter.Message(self.window, text='', font='font 6')
+        spacing.grid(row=row)
+        row += 1
+
+        # Place the window at the X and Y coordinates from either the INI or the previous window
+        self.window.deiconify()  # Show the GUI
+        self.window.geometry('+%d+%d' % (window_x, window_y))
+
+    def open1(self):
+        game_path = isaac_resources_directory.replace('/', '\\')
+        game_path = game_path[:-10]  # Chop off the "\resources" part of the path
+        subprocess.call(['explorer', game_path])
+
+    def open2(self):
+        documents_path = 'C:\\Users\\' + os.getenv('username') + '\\Documents\\My Games\\Binding of Isaac Afterbirth'
+        if os.path.isdir(documents_path):
+            subprocess.call(['explorer', documents_path])
+        else:
+            error('Failed to automatically find your documents directory. To find it, look for the "savedatapath.txt" file in your Isaac game directory.', None)
+
+    def uninstall_all(self):
+        purge_resources_directory(self)
+
+    def go_back(self):
+        get_window_x_y(self)
+        self.window.destroy()
+        ModSelectionWindow(self.parent)
+
+
+###########################
 # General window functions
-#####################################
+###########################
 
 def get_window_x_y(self):
     # Global variables
@@ -2010,6 +2123,22 @@ def uninstall_mod(self):
 
     # Exit the program
     sys.exit()
+
+
+def purge_resources_directory(self):
+    if backed_up_resources_directory == True:
+        # During the start of the program, everything in the resources directory got copied to a temporary directory (except for the "packed" directory)
+        # Remove everything from the temporary directory EXCEPT config.ini
+        for file_name in os.listdir(temp_directory):
+            if file_name != 'config.ini':
+                delete_file_if_exists(os.path.join(temp_directory, file_name))
+
+        warning('All mods have been uninstalled. Your "resources" folder is clean.', None)
+
+        # Uninstall the mod and exit
+        uninstall_mod(self)
+    else:
+        warning('It appears that your resources folder is already clean; there were no custom mods installed before you opened ' + mod_pretty_name + '.', None)
 
 
 ################
