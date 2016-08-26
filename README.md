@@ -103,6 +103,9 @@ You can find the documentation for the "Normal / Unseeded" ruleset on [the GitHu
 
 ## Version History
 
+* *3.3.1* - August 26th
+  * Added the files from the Jud6s Mod v1.31. (Only a "config.ini" change. If you use a "config.ini" file, you might want to check the values of "EnableColorCorrection" and "EnableFilter" to ensure they are correct.)
+  * Fixed a typo in the Pageant Boy tournament ruleset menu screen.
 * *3.3.0* - August 25th
   * Added an "Exit" button to the main menu.
   * Added a "Miscellaneous Stuff" button to the main menu that contains 3 new features:

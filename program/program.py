@@ -645,7 +645,7 @@ class Jud6sWindow():
             copy_file('jud6s-extra/' + ruleset_name + '/players.xml', os.path.join(isaac_resources_directory, 'players.xml'))
             
             # The ruleset name is too long for the title screen, so make it shorter
-            ruleset_name = 'Pageant Boy Tourny'
+            ruleset_name = 'Pageant Boy Tourney'
 
         # Draw a title screen and save it overtop the old title screen
         if ruleset != 1:
