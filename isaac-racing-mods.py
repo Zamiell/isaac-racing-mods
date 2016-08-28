@@ -334,8 +334,8 @@ class UpdaterTask(threading.Thread):
         if not os.path.isfile(os.path.join(latest_version, 'program.exe')):
             self.error('There was not a "program.exe" file in the downloaded zip file, so something went wrong.\nTry downloading the latest version manually.', None)
 
-        # Copy the 3 README files
-        for file_name in ['README.txt', 'README-diversity-mod.txt', 'README-instant-start-mod.txt']:
+        # Copy the README file
+        for file_name in ['README.txt']:
             if not os.path.isfile(os.path.join(latest_version, file_name)):
                 self.error('There was not a "' + file_name + '" file in the downloaded zip file, so something went wrong.\nTry downloading the latest version manually.', None)
             self.delete_file_if_exists(file_name);

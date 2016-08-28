@@ -1,0 +1,163 @@
+<!DOCTYPE HTML>
+<!--
+	Prologue by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+	<head>
+		<title>Isaac Racing Mods</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<!--[if lte IE 8]><script src="assets/js/ie/html5shiv.js"></script><![endif]-->
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<!--[if lte IE 8]><link rel="stylesheet" href="assets/css/ie8.css" /><![endif]-->
+		<!--[if lte IE 9]><link rel="stylesheet" href="assets/css/ie9.css" /><![endif]-->
+		<link rel="icon" type="image/png" href="images/favicon.png">
+	</head>
+	<body>
+
+		<!-- Header -->
+			<div id="header">
+
+				<div class="top">
+
+					<!-- Logo -->
+						<div id="logo">
+							<!--<span class="image avatar"><img src="images/d6.png" alt="" /></span>-->
+							<h1 id="title">Isaac Racing Mods</h1>
+							<p>A collection of racing mods</p>
+						</div>
+
+					<!-- Nav -->
+						<nav id="nav">
+							<!--
+
+								Prologue's nav expects links in one of two formats:
+
+								1. Hash link (scrolls to a different section within the page)
+
+								   <li><a href="#foobar" id="foobar-link" class="icon fa-whatever-icon-you-want skel-layers-ignoreHref"><span class="label">Foobar</span></a></li>
+
+								2. Standard link (sends the user to another page/site)
+
+								   <li><a href="http://foobar.tld" id="foobar-link" class="icon fa-whatever-icon-you-want"><span class="label">Foobar</span></a></li>
+
+							-->
+							<ul>
+								<li><a href="#top" id="top-link" class="skel-layers-ignoreHref"><span class="icon">Download</span></a></li>
+								<li><a href="#what-is-it" id="what-is-it-link" class="skel-layers-ignoreHref"><span class="icon">What Is It?</span></a></li>
+								<li><a href="#what-exactly" id="what-exactly-link" class="skel-layers-ignoreHref"><span class="icon">What Does It Do?</span></a></li>
+								<li><a href="#known-issues" id="known-issues-link" class="skel-layers-ignoreHref"><span class="icon">Known Issues</span></a></li>
+								<li><a href="https://github.com/Zamiell/isaac-racing-mods/blob/master/docs/version_history.md" id="version-history-link" class="skel-layers-ignoreHref"><span class="icon">Version History</span></a></li>
+							</ul>
+						</nav>
+
+				</div>
+
+			</div>
+
+		<!-- Main -->
+			<div id="main">
+
+				<!-- Intro -->
+					<section id="top" class="one dark cover">
+						<div class="container">
+
+							<header>
+
+								<h2><img src="images/d6.png" width="54" style="position: relative; top: 12px;"> &nbsp; <strong>Isaac Racing Mods</strong></h2>
+								<p>A collection of racing mods for <i>The Binding of Isaac: Afterbirth</i></p>
+							</header>
+
+							<footer>
+								<p><a id="download-button" class="button" href="https://github.com/Zamiell/isaac-racing-mods/releases/download/3.4.0/isaac-racing-mods.zip">Download the <span style="font-weight: bold;">Isaac Racing Mods</span> package</a></p>							</footer>
+						</div>
+					</section>
+
+					<section id="what-is-it" class="two">
+						<div class="container">
+
+							<header>
+								<h2>What Is It?</h2>
+							</header>
+
+							<p class="before-ul">This is a program that contains 3 racing mods:</p>
+							<ul>
+								<li><a href="https://zamiell.github.io/jud6s">The Jud6s Mod</a></li>
+								<li><a href="https://github.com/Zamiell/isaac-racing-mods/blob/master/docs/instant-start-mod.md">Instant Start Mod</a></li>
+								<li><a href="https://github.com/Zamiell/isaac-racing-mods/blob/master/docs/diversity-mod.md">Diversity Mod</a></li>
+							</ul>
+							<p>It will also automatically keep everything up to date so that you don't have to be bothered downloading the latest versions over and over.</p>
+							<p>To use it, simply run the <code>isaac-racing-mods</code> program. You do not have to move any files or uninstall other mods.</p>
+
+						</div>
+					</section>
+
+					<section id="what-exactly" class="three">
+						<div class="container">
+
+							<header>
+								<h2>What Exactly Does the Program Do?</h2>
+							</header>
+
+							<ul>
+								<li>When the program is started, any important files in your "resources" directory are backed up to "resources_tmp##########" (a directory name corresponding to the current time).</li>
+								<li>Once you select the mod you want to play, it moves files into your "resources" directory and automatically starts Isaac.</li>
+								<li>When closed, the program will put everything in your "resources" directory back to the way it was.</li>
+							</ul>
+
+						</div>
+					</section>
+
+					<section id="known-issues" class="two">
+						<div class="container">
+
+							<header>
+								<h2>Known Issues</h2>
+							</header>
+
+							<ul>
+								<li>If the program closes unexpectedly, it can leave mod files installed. To fix this and go back to a "vanilla" game, open the program, select "Miscellaneous Stuff", and click on "Uninstall all existing mods". Or, if you want to do it yourself manually, simply delete all of the files and folders in the Isaac "resources" directory except for the "packed" directory. By default, the "resources" directory is located at:<br />
+								<code>C:\Program Files (x86)\Steam\steamapps\common\The Binding of Isaac Rebirth\resources</code></li>
+								<li>There are no release versions for OS X or Linux. However, the program is written in Python 3.4 and is cross-platform. If you have the technical know how, you can just download the source code and run the Python script directly (<a href="https://github.com/Zamiell/isaac-racing-mods">see the GitHub repository page</a>).</li>
+							</ul>
+
+						</div>
+					</section>
+
+					<section id="version-history" class="three">
+						<div class="container">
+
+							<header>
+								<h2>Version History</h2>
+							</header>
+
+							<p>The version history can be found <a href="https://github.com/Zamiell/isaac-racing-mods/blob/master/docs/version_history.md">on a separate page</a>.</p>
+
+						</div>
+					</section>
+
+				</div>
+
+		<!-- Footer -->
+			<div id="footer">
+
+				<!-- Copyright -->
+					<ul class="copyright">
+						<li>Design: <a href="https://html5up.net">HTML5 UP</a></li>
+					</ul>
+
+			</div>
+
+		<!-- Scripts -->
+			<script src="assets/js/jquery.min.js"></script>
+			<script src="assets/js/jquery.scrolly.min.js"></script>
+			<script src="assets/js/jquery.scrollzer.min.js"></script>
+			<script src="assets/js/skel.min.js"></script>
+			<script src="assets/js/util.js"></script>
+			<!--[if lte IE 8]><script src="assets/js/ie/respond.min.js"></script><![endif]-->
+			<script src="assets/js/main.js"></script>
+
+	</body>
+</html>

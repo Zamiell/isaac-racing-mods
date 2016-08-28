@@ -23,7 +23,6 @@ import random                 # For getting a random start
 import re                     # For the search text box
 import string                 # For generating a random Diversity seed (1/2)
 import binascii               # For generating a random Diversity seed (2/2)
-import platform               # For operating system detection
 from PIL import Image, ImageFont, ImageDraw, ImageTk  # For drawing things on the title and character screen
 
 # Configuration
@@ -194,13 +193,14 @@ def set_custom_path():
 
 def launch_isaac():
     # If Isaac is running, kill it
-    if platform.system() == 'Windows':  # This causes OS X to crash for some reason
+    if automatically_close_isaac == True:
         try:
             for process in psutil.process_iter():
                 if process.name() == 'isaac-ng.exe':
                     process.kill()
         except Exception as e:
-            error(mod_pretty_name + ' could not automatically close Isaac:', e)
+            warning(mod_pretty_name + ' encountered a problem while scanning to see if Isaac is open (or automatically closing Isaac if it was open). If this problem persists, from the main menu, select "Miscellaneous Stuff" and uncheck the option for "Automatically attempt to close Isaac".', None)
+            return
 
     # Wait 0.5 seconds before launching to try and prevent the bug where only certain parts of the mod get loaded
     time.sleep(0.5)
@@ -545,6 +545,10 @@ class Jud6sWindow():
         # Copy over the "jud6s" directory, which represents the base files for the mod
         for file_name in os.listdir('jud6s'):
             copy_file(os.path.join('jud6s', file_name), os.path.join(isaac_resources_directory, file_name))
+
+        # Delete the "versusscreen.anm2" file if the user wants to keep the boss cutscenes
+        if remove_boss_cutscenes == False:
+            delete_file_if_exists(os.path.join(isaac_resources_directory, 'gfx/ui/boss/versusscreen.anm2'))
 
         # 1 - Normal / Unseeded
         if ruleset == 1:
@@ -969,14 +973,14 @@ class InstantStartWindow():
         # _configure_interior - Track changes to the canvas and frame width and sync them (while also updating the scrollbar)
         def _configure_interior(event):
             # Update the scrollbars to match the size of the inner frame
-            size = (imageBox.winfo_reqwidth(), imageBox.winfo_reqheight())
+            size = (image_box.winfo_reqwidth(), image_box.winfo_reqheight())
             canvas.config(scrollregion='0 0 %s %s' % size)
-            if imageBox.winfo_reqwidth() != canvas.winfo_width():
+            if image_box.winfo_reqwidth() != canvas.winfo_width():
                 # Update the canvas's width to fit the inner frame
-                canvas.config(width=imageBox.winfo_reqwidth())
+                canvas.config(width=image_box.winfo_reqwidth())
 
         def _configure_canvas(event):
-            if imageBox.winfo_reqwidth() != imageBox.winfo_width():
+            if image_box.winfo_reqwidth() != image_box.winfo_width():
                 # Update the inner frame's width to fill the canvas
                 canvas.itemconfigure(interior_id, width=canvas.winfo_width())
 
@@ -1014,9 +1018,9 @@ class InstantStartWindow():
         canvas.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=tkinter.TRUE)
 
         # Scrolling code taken from: http://stackoverflow.com/questions/16188420/python-tkinter-scrollbar-for-frame
-        imageBox = tkinter.LabelFrame(canvas, borderwidth=0)
-        interior_id = canvas.create_window(0, 0, window=imageBox, anchor=tkinter.NW)
-        imageBox.bind('<Configure>', _configure_interior)
+        image_box = tkinter.LabelFrame(canvas, borderwidth=0)
+        interior_id = canvas.create_window(0, 0, window=image_box, anchor=tkinter.NW)
+        image_box.bind('<Configure>', _configure_interior)
         canvas.bind('<Configure>', _configure_canvas)
 
         # Define keyboard bindings
@@ -1033,11 +1037,11 @@ class InstantStartWindow():
         # Start to build the GUI window
         hearts_list = get_heart_icons()
         hud_list = get_hud_icons()
-        tkinter.Label(imageBox, text='Click a build to play it', font='font 32 bold').grid(row=row, pady=5)
+        tkinter.Label(image_box, text='Click a build to play it', font='font 32 bold').grid(row=row, pady=5)
         row += 1
 
         # Search label
-        search_widget_space = tkinter.Label(imageBox)
+        search_widget_space = tkinter.Label(image_box)
         search_label = tkinter.Label(search_widget_space, text='Search: ', font=('Helvetica', 15))
         search_label.grid(row=0, column=0)
 
@@ -1052,7 +1056,7 @@ class InstantStartWindow():
         row += 1
 
         # "Go Back" button
-        go_back_button = tkinter.Button(imageBox, text=' Go Back (Esc)', compound='left')
+        go_back_button = tkinter.Button(image_box, text=' Go Back (Esc)', compound='left')
         go_back_button.configure(font=('Helvetica', 11))
         go_back_button.configure(command=go_back)  # Goes to nested function, not class function
         go_back_button.grid(row=row, pady=15)
@@ -1067,36 +1071,36 @@ class InstantStartWindow():
         for index, child in enumerate(builds):
             # Draw dividers in between the different kinds of starts
             if index == 0:
-                tkinter.Message(imageBox, text='', font='font 12').grid(row=row)  # Spacing
+                tkinter.Message(image_box, text='', font='font 12').grid(row=row)  # Spacing
                 row += 1
-                tkinter.Label(imageBox, text='Treasure Room Starts', font='font 20 bold').grid(row=row, pady=5)
+                tkinter.Label(image_box, text='Treasure Room Starts', font='font 20 bold').grid(row=row, pady=5)
                 row += 1
             elif index == 19:
-                tkinter.Message(imageBox, text='', font='font 12').grid(row=row)  # Spacing
+                tkinter.Message(image_box, text='', font='font 12').grid(row=row)  # Spacing
                 row += 1
-                tkinter.Label(imageBox, text='Devil Room Starts', font='font 20 bold').grid(row=row, pady=5)
+                tkinter.Label(image_box, text='Devil Room Starts', font='font 20 bold').grid(row=row, pady=5)
                 row += 1
             elif index == 22:
-                tkinter.Message(imageBox, text='', font='font 12').grid(row=row)  # Spacing
+                tkinter.Message(image_box, text='', font='font 12').grid(row=row)  # Spacing
                 row += 1
-                tkinter.Label(imageBox, text='Angel Room Starts', font='font 20 bold').grid(row=row, pady=5)
+                tkinter.Label(image_box, text='Angel Room Starts', font='font 20 bold').grid(row=row, pady=5)
                 row += 1
             elif index == 25:
-                tkinter.Message(imageBox, text='', font='font 12').grid(row=row)  # Spacing
+                tkinter.Message(image_box, text='', font='font 12').grid(row=row)  # Spacing
                 row += 1
-                tkinter.Label(imageBox, text='Custom Starts (with the D6)', font='font 20 bold').grid(row=row, pady=5)
+                tkinter.Label(image_box, text='Custom Starts (with the D6)', font='font 20 bold').grid(row=row, pady=5)
                 row += 1
             elif index == 29:
-                tkinter.Message(imageBox, text='', font='font 12').grid(row=row)  # Spacing
+                tkinter.Message(image_box, text='', font='font 12').grid(row=row)  # Spacing
                 row += 1
-                tkinter.Label(imageBox, text='Custom Starts (without the D6)', font='font 20 bold').grid(row=row, pady=5)
+                tkinter.Label(image_box, text='Custom Starts (without the D6)', font='font 20 bold').grid(row=row, pady=5)
                 row += 1
 
             # Background color
             current_bgcolor = '#E0E0E0' if current_bgcolor == '#949494' else '#949494'
 
             # Draw the build frame here
-            build_frame = tkinter.LabelFrame(imageBox, bg=current_bgcolor)
+            build_frame = tkinter.LabelFrame(image_box, bg=current_bgcolor)
             build_frame.bind('<Button-1>', select_build)
             build_frame.build = child
             build_frames[index] = build_frame
@@ -1184,8 +1188,8 @@ class InstantStartWindow():
         # Place the window at the X and Y coordinates from either the INI or the previous window
         self.window2.deiconify()  # Show the GUI
         self.window2.update_idletasks()  # Update the GUI
-        window_width = imageBox.winfo_width() + scrollbar.winfo_width() + 2
-        window_height = max(min(int(self.window2.winfo_vrootheight() * 2 / 3), imageBox.winfo_height() + 4), self.window2.winfo_height())
+        window_width = image_box.winfo_width() + scrollbar.winfo_width() + 2
+        window_height = max(min(int(self.window2.winfo_vrootheight() * 2 / 3), image_box.winfo_height() + 4), self.window2.winfo_height())
         self.window2.geometry('%dx%d+%d+%d' % (window_width, window_height, window_x, window_y))
 
     def get_random_start(self):
@@ -1243,6 +1247,10 @@ class InstantStartWindow():
         # Copy over the "jud6s" directory, which represents the base files for the mod
         for file_name in os.listdir('jud6s'):
             copy_file(os.path.join('jud6s', file_name), os.path.join(isaac_resources_directory, file_name))
+
+        # Delete the "versusscreen.anm2" file if the user wants to keep the boss cutscenes
+        if remove_boss_cutscenes == False:
+            delete_file_if_exists(os.path.join(isaac_resources_directory, 'gfx/ui/boss/versusscreen.anm2'))
 
         # Make a custom title menu graphic that represents which options were selected
         self.draw_title_graphic()
@@ -1700,6 +1708,10 @@ class DiversityWindow():
         for file_name in os.listdir('jud6s'):
             copy_file(os.path.join('jud6s', file_name), os.path.join(isaac_resources_directory, file_name))
 
+        # Delete the "versusscreen.anm2" file if the user wants to keep the boss cutscenes
+        if remove_boss_cutscenes == False:
+            delete_file_if_exists(os.path.join(isaac_resources_directory, 'gfx/ui/boss/versusscreen.anm2'))
+
         # Trim the whitespace on the seed string if there is any
         self.entry_box_contents.set("".join(self.entry_box_contents.get().split()))
 
@@ -1897,41 +1909,69 @@ class MiscellaneousWindow():
         # Start counting rows
         row = 0
 
-        # Miscellaneous Stuff
+        # "Select an option" label
         select_message = tkinter.Message(self.window, justify=tkinter.CENTER, text='Select an option:', font='font 20', width=400)
         select_message.grid(row=row, pady=5, padx=100)  # Widen the window
         row += 1
 
+        # Spacing
+        spacing = tkinter.Message(self.window, text='', font='font 6')
+        spacing.grid(row=row)
+        row += 1
+
+        # "Remove boss cutscenes" checkbox
+        self.remove_boss_cutscenes_mode = tkinter.IntVar()
+        if remove_boss_cutscenes == True:
+            self.remove_boss_cutscenes_mode.set(1)
+        self.remove_boss_cutscenes_checkbox = tkinter.Checkbutton(self.window, text='Remove boss cutscenes (1)', font='font 14', variable=self.remove_boss_cutscenes_mode, command=self.remove_boss_cutscenes_checked)
+        self.remove_boss_cutscenes_checkbox.grid(row=row)
+        self.window.bind('1', lambda event: self.remove_boss_cutscenes_checkbox.invoke())
+        row += 1
+
+        # "Automatically attempt to close Isaac" checkbox
+        self.close_isaac_mode = tkinter.IntVar()
+        if automatically_close_isaac == True:
+            self.close_isaac_mode.set(1)
+        self.close_isaac_checkbox = tkinter.Checkbutton(self.window, text='Automatically attempt to close Isaac (2)', font='font 14', variable=self.close_isaac_mode, command=self.close_isaac_checkbox_checked)
+        self.close_isaac_checkbox.grid(row=row)
+        self.window.bind('2', lambda event: self.close_isaac_checkbox.invoke())
+        row += 1
+
+        # Spacing
+        spacing = tkinter.Message(self.window, text='', font='font 6')
+        spacing.grid(row=row)
+        row += 1
+
         # "Open Isaac game directory" button
-        open1_button = tkinter.Button(self.window, text=' Open Isaac game directory (1) ', compound='left')
+        open1_button = tkinter.Button(self.window, text=' Open Isaac game directory (3) ', compound='left')
         open1_button.configure(font=('Helvetica', 13, 'bold'))
         open1_button.configure(command=self.open1)
         open1_button.grid(row=row, pady=5)
-        self.window.bind('1', lambda event: self.open1())
+        self.window.bind('3', lambda event: self.open1())
         row += 1
 
         # "Open Isaac documents directory" button
-        open2_button = tkinter.Button(self.window, text=' Open Isaac documents directory (2) ', compound='left')
+        open2_button = tkinter.Button(self.window, text=' Open Isaac documents directory (4) ', compound='left')
         open2_button.configure(font=('Helvetica', 13, 'bold'))
         open2_button.configure(command=self.open2)
         open2_button.grid(row=row, pady=5)
-        self.window.bind('2', lambda event: self.open2())
+        self.window.bind('4', lambda event: self.open2())
         row += 1
 
         # "Uninstall all existing mods" button
-        uninstall_button = tkinter.Button(self.window, text=' Uninstall all existing mods (3) ', compound='left')
+        uninstall_button = tkinter.Button(self.window, text=' Uninstall all existing mods (5) ', compound='left')
         uninstall_button.configure(font=('Helvetica', 13, 'bold'))
         uninstall_button.configure(command=self.uninstall_all)
         uninstall_button.grid(row=row, pady=5)
-        self.window.bind('3', lambda event: self.uninstall_all())
+        self.window.bind('5', lambda event: self.uninstall_all())
         row += 1
 
         # "Go Back" button
-        go_back_button = tkinter.Button(self.window, text=' Go Back (4) ', compound='left')
+        go_back_button = tkinter.Button(self.window, text=' Go Back (6) ', compound='left')
         go_back_button.configure(font=('Helvetica', 13))
         go_back_button.configure(command=self.go_back)
         go_back_button.grid(row=row, pady=25)
-        self.window.bind('4', lambda event: go_back_button.invoke())
+        self.window.bind('6', lambda event: go_back_button.invoke())
         row += 1
 
         # Spacing
@@ -1942,6 +1982,66 @@ class MiscellaneousWindow():
         # Place the window at the X and Y coordinates from either the INI or the previous window
         self.window.deiconify()  # Show the GUI
         self.window.geometry('+%d+%d' % (window_x, window_y))
+
+    def remove_boss_cutscenes_checked(self):
+        # Global variables
+        global mod_options
+
+        # Check to see if the box was checked or unchecked
+        if self.remove_boss_cutscenes_mode.get() == 0:
+            remove_boss_cutscenes = False
+
+            # Write the new path to the INI file
+            mod_options.set('options', 'remove_boss_cutscenes', 'false')
+            try:
+                with open(os.path.join('..', 'options.ini'), 'w') as config_file:
+                    mod_options.write(config_file)
+            except Exception as e:
+                error('Failed to write the new "remove_boss_cutscenes" value to the "options.ini" file:', e)
+
+        elif self.remove_boss_cutscenes_mode.get() == 1:
+            remove_boss_cutscenes = True
+
+            # Write the new path to the INI file
+            mod_options.set('options', 'remove_boss_cutscenes', 'true')
+            try:
+                with open(os.path.join('..', 'options.ini'), 'w') as config_file:
+                    mod_options.write(config_file)
+            except Exception as e:
+                error('Failed to write the new "remove_boss_cutscenes" value to the "options.ini" file:', e)
+
+        else:
+            error('The "Automatically attempt to close Isaac" checkbox has an invalid value of ' + str(self.close_isaac_mode.get()) + '.', None)
+
+    def close_isaac_checkbox_checked(self):
+        # Global variables
+        global mod_options
+
+        # Check to see if the box was checked or unchecked
+        if self.close_isaac_mode.get() == 0:
+            automatically_close_isaac = False
+
+            # Write the new path to the INI file
+            mod_options.set('options', 'automatically_close_isaac', 'false')
+            try:
+                with open(os.path.join('..', 'options.ini'), 'w') as config_file:
+                    mod_options.write(config_file)
+            except Exception as e:
+                error('Failed to write the new "automatically_close_isaac" value to the "options.ini" file:', e)
+
+        elif self.close_isaac_mode.get() == 1:
+            automatically_close_isaac = True
+
+            # Write the new path to the INI file
+            mod_options.set('options', 'automatically_close_isaac', 'true')
+            try:
+                with open(os.path.join('..', 'options.ini'), 'w') as config_file:
+                    mod_options.write(config_file)
+            except Exception as e:
+                error('Failed to write the new "automatically_close_isaac" value to the "options.ini" file:', e)
+
+        else:
+            error('The "Automatically attempt to close Isaac" checkbox has an invalid value of ' + str(self.close_isaac_mode.get()) + '.', None)
 
     def open1(self):
         game_path = isaac_resources_directory.replace('/', '\\')
@@ -2152,6 +2252,8 @@ def main():
     global isaac_resources_directory
     global window_x
     global window_y
+    global remove_boss_cutscenes
+    global automatically_close_isaac
     global jud6s_version
     global config_ini_exists
     global backed_up_resources_directory
@@ -2180,6 +2282,10 @@ def main():
         error('The "options.ini" file does not contain an entry for the X position of your window. Try adding "window_x = 50" or redownloading the program.', None)
     if 'window_y' not in mod_options['options']:
         error('The "options.ini" file does not contain an entry for the Y position of your window. Try adding "window_y = 50" or redownloading the program.', None)
+    if 'remove_boss_cutscenes' not in mod_options['options']:
+        error('The "options.ini" file does not contain a "remove_boss_cutscenes" entry. Try adding "remove_boss_cutscenes = true" or redownloading the program.', None)
+    if 'automatically_close_isaac' not in mod_options['options']:
+        error('The "options.ini" file does not contain an "automatically_close_isaac" entry. Try adding "automatically_close_isaac = true" or redownloading the program.', None)
 
     # Get variables from the "options.ini" file
     mod_version = mod_options['options']['mod_version']
@@ -2187,8 +2293,22 @@ def main():
     isaac_resources_directory = mod_options['options']['isaac_resources_directory']
     window_x = int(mod_options['options']['window_x'])
     window_y = int(mod_options['options']['window_y'])
+    remove_boss_cutscenes = mod_options['options']['remove_boss_cutscenes']
+    if remove_boss_cutscenes == 'true':
+        remove_boss_cutscenes = True
+    elif remove_boss_cutscenes == 'false':
+        remove_boss_cutscenes = False
+    else:
+        error('The "options.ini" value for "remove_boss_cutscenes" is not set to true or false.', None)
+    automatically_close_isaac = mod_options['options']['automatically_close_isaac']
+    if automatically_close_isaac == 'true':
+        automatically_close_isaac = True
+    elif automatically_close_isaac == 'false':
+        automatically_close_isaac = False
+    else:
+        error('The "options.ini" value for "automatically_close_isaac" is not set to true or false.', None)
 
-    # Get the version number of the Jud6s mod specifically (which is different than the version number of this mod)
+    # Get the version number of the Jud6s mod (which is different than the version number of the racing mod pack)
     try:
         with open('jud6s/jud6s_version.txt', 'r') as file:
             jud6s_version = file.read()

@@ -8,6 +8,9 @@ import os            # For various file operations (1/2)
 import shutil        # For various file operations (2/2)
 import subprocess    # To call pyinstaller
 import configparser  # For parsing options.ini
+import fileinput     # For updating the webpage
+import re            # For parsing the webpage
+import sys
 
 # Configuration
 mod_pretty_name = 'Isaac Racing Mods'
@@ -25,6 +28,22 @@ mod_options.set('options', 'window_x', '50')
 mod_options.set('options', 'window_y', '50')
 with open('options.ini', 'w') as config_file:
     mod_options.write(config_file)
+
+# Set the correct download link on the webpage
+updated_link = False
+webpage_file = 'docs/index.html'
+with fileinput.FileInput(webpage_file, inplace=True) as file:
+    for line in file:
+        line = line.rstrip()
+        match = re.search(r'<a id="download-button" class="button" href="https://github.com/Zamiell/isaac-racing-mods/releases/download/\d+.\d+.\d+/isaac-racing-mods.zip">', line)
+        if match:
+            new_link = r'<a id="download-button" class="button" href="https://github.com/Zamiell/isaac-racing-mods/releases/download/' + mod_version + '/isaac-racing-mods.zip">'
+            print(line.replace(match.group(), new_link), end='')
+            updated_link = True
+        else:
+            print(line)
+if updated_link == False:
+    print('Failed to update the webpage.')
 
 # Clean up build-related directories before we start to do anything
 if os.path.exists('build'):
@@ -55,7 +74,7 @@ install_directory = os.path.join('release', mod_name)
 shutil.move('dist', install_directory)  # We use shutil.move() instead of os.rename() because it will create the intermediary directories
 
 # Copy over necessary files
-for file_name in ['options.ini', 'README.md', 'README-diversity-mod.md', 'README-instant-start-mod.md', 'Shortcut to BoIA Resources Folder.lnk']:
+for file_name in ['options.ini', 'README.md', 'Shortcut to BoIA Resources Folder.lnk']:
     shutil.copy(file_name, os.path.join(install_directory, file_name))
 for directory_name in ['images', 'program']:
     shutil.copytree(directory_name, os.path.join(install_directory, directory_name))
@@ -69,10 +88,8 @@ shutil.move(os.path.join(install_directory, 'program.exe'), os.path.join(install
 # Rename the "program" directory to the version number of the mod
 os.rename(os.path.join(install_directory, 'program'), os.path.join(install_directory, mod_version))
 
-# Rename README.md to README.txt extension so that noobs are less confused
+# Rename README.md to README.txt so that noobs are less confused
 shutil.move(os.path.join(install_directory, 'README.md'), os.path.join(install_directory, 'README.txt'))
-shutil.move(os.path.join(install_directory, 'README-diversity-mod.md'), os.path.join(install_directory, 'README-diversity-mod.txt'))
-shutil.move(os.path.join(install_directory, 'README-instant-start-mod.md'), os.path.join(install_directory, 'README-instant-start-mod.txt'))
 
 # Move the standalone updater next to where the zip files will be created
 shutil.move(os.path.join(install_directory, mod_name + '-standalone-updater.exe'), 'release')
@@ -81,10 +98,10 @@ shutil.move(os.path.join(install_directory, mod_name + '-standalone-updater.exe'
 shutil.make_archive(os.path.join('release', mod_name), 'zip', os.path.join('release', mod_name))
 
 # Make a second zip file for people just updating the program
-for file_name in ['README.txt', 'README-diversity-mod.txt', 'README-instant-start-mod.txt']:  # Include the README files in it
+for file_name in ['README.txt']:  # Include the README file in it
     shutil.copy(os.path.join(install_directory, file_name), os.path.join(install_directory, mod_version, file_name))
 shutil.make_archive(os.path.join('release', mod_name + '-patch-package'), 'zip', os.path.join(install_directory, mod_version))
-for file_name in ['README.txt', 'README-diversity-mod.txt', 'README-instant-start-mod.txt']:
+for file_name in ['README.txt']:
     os.unlink(os.path.join(install_directory, mod_version, file_name))
 
 # Clean up
