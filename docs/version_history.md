@@ -1,5 +1,7 @@
 # Version History
 
+* *3.4.2* - August 28th
+  * Changed "EnableColorCorrection" in the default "config.ini" back to 1, since it makes the game look too dark without actually increasing performance. (Thanks to Krakenos for this.) (This was the only change in the Jud6s Mod v1.21.)
 * *3.4.1* - August 28th
   * Fixed a bug with the "Miscellaneous Stuff" checkboxes not properly activating.
 * *3.4.0* - August 28th
@@ -8,7 +10,7 @@
   * If something goes wrong when attempting to close Isaac, the error message will be more helpful.
   * A new optional checkbox has been added to the "Miscellaneous Stuff" section to prevent the program from removing the boss cutscenes for those who mostly speedrun instead of race.
 * *3.3.1* - August 26th
-  * Added the files from the Jud6s Mod v1.31. (Only a "config.ini" change. If you use a "config.ini" file, you might want to check the values of "EnableColorCorrection" and "EnableFilter" to ensure they are correct.)
+  * Changed the "EnableColorCorrection" and "EnableFilter" values in the default "config.ini" to 0. (They were mistakenly set to 1.) (This was the only change in the Jud6s Mod v1.31.)
   * Fixed a typo in the Pageant Boy tournament ruleset menu screen.
 * *3.3.0* - August 25th
   * Added an "Exit" button to the main menu.
