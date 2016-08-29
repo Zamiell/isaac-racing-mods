@@ -1986,6 +1986,7 @@ class MiscellaneousWindow():
     def remove_boss_cutscenes_checked(self):
         # Global variables
         global mod_options
+        global remove_boss_cutscenes
 
         # Check to see if the box was checked or unchecked
         if self.remove_boss_cutscenes_mode.get() == 0:
@@ -2016,6 +2017,7 @@ class MiscellaneousWindow():
     def close_isaac_checkbox_checked(self):
         # Global variables
         global mod_options
+        global automatically_close_isaac
 
         # Check to see if the box was checked or unchecked
         if self.close_isaac_mode.get() == 0:

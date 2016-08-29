@@ -1,5 +1,7 @@
 # Version History
 
+* *3.4.1* - August 28th
+  * Fixed a bug with the "Miscellaneous Stuff" checkboxes not properly activating.
 * *3.4.0* - August 28th
   * The documentation for the mod was moved from the README file (and [the GitHub repository page](https://github.com/Zamiell/jud6s)) to [a new website](http://zamiell.github.io/jud6s/).
   * A new optional checkbox has been added to the "Miscellaneous Stuff" section to prevent the program from automatically closing Isaac.

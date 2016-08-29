@@ -35,15 +35,16 @@ webpage_file = 'docs/index.html'
 with fileinput.FileInput(webpage_file, inplace=True) as file:
     for line in file:
         line = line.rstrip()
-        match = re.search(r'<a id="download-button" class="button" href="https://github.com/Zamiell/isaac-racing-mods/releases/download/\d+.\d+.\d+/isaac-racing-mods.zip">', line)
+        match = re.search(r'<a id="download-button" class="button" href="https://github.com/Zamiell/isaac-racing-mods/releases/download/\d+\.\d+\.\d+/isaac-racing-mods.zip">Download v\d+\.\d+\.\d+</a>', line) # v\d+\.\d+\.\d+
         if match:
-            new_link = r'<a id="download-button" class="button" href="https://github.com/Zamiell/isaac-racing-mods/releases/download/' + mod_version + '/isaac-racing-mods.zip">'
-            print(line.replace(match.group(), new_link), end='')
+            new_link = r'<a id="download-button" class="button" href="https://github.com/Zamiell/isaac-racing-mods/releases/download/' + mod_version + '/isaac-racing-mods.zip">Download v' + mod_version + '</a>'
+            print(line.replace(match.group(), new_link))
             updated_link = True
         else:
             print(line)
 if updated_link == False:
     print('Failed to update the webpage.')
+    sys.exit(1)
 
 # Clean up build-related directories before we start to do anything
 if os.path.exists('build'):
