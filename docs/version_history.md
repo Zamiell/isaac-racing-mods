@@ -1,7 +1,7 @@
 # Version History
 
 * *3.4.2* - August 28th
-  * Changed "EnableColorCorrection" in the default "config.ini" back to 1, since it makes the game look too dark without actually increasing performance. (Thanks to Krakenos for this.) (This was the only change in the Jud6s Mod v1.21.)
+  * Changed "EnableColorCorrection" in the default "config.ini" back to 1, since it makes the game look too dark without actually increasing performance. (Thanks to Krakenos for this.) (This was the only change in the Jud6s Mod v1.32.)
 * *3.4.1* - August 28th
   * Fixed a bug with the "Miscellaneous Stuff" checkboxes not properly activating.
 * *3.4.0* - August 28th
