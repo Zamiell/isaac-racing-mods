@@ -105,7 +105,7 @@ text = {
     },
     'Keep this program open': {
         'en': 'Keep this program open while playing.',
-        'fr': 'Laisser ce programme ouvert pendant que vous jouez.',
+        'fr': 'Laissez ce programme ouvert pendant que vous jouez.',
     },
     'Isaac will return to normal': {
         'en': 'Isaac will return to normal when this program is closed.',
