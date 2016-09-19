@@ -167,7 +167,7 @@ class UpdateWindow():
             # The update has finished, so as a sanity check, see if the program exists
             program_exe = os.path.join(program_directory, mod_name + '.exe')
             if not os.path.isfile(program_exe):
-                error('The ' + mod_pretty_name + ' program was updated, but the "' + program_exe + '" file does not exist, so something clearly went wrong along the way.\nPlease redownload the program manually.', None)
+                error('The ' + mod_pretty_name + ' program was updated, but the "' + program_exe + '" file does not exist, so something went wrong along the way.\nPlease redownload the program manually.', None)
 
             # Open the program
             subprocess.Popen([program_exe], cwd=program_directory)

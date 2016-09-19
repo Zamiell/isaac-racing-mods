@@ -24,6 +24,10 @@ import re                     # For the search text box
 import string                 # For generating a random Diversity seed (1/2)
 import binascii               # For generating a random Diversity seed (2/2)
 from PIL import Image, ImageFont, ImageDraw, ImageTk  # For drawing things on the title and character screen
+import languages              # Translations for languages other than English
+import platform               # For autodetecting the user's language (1/3)
+import locale                 # For autodetecting the user's language (2/3)
+import ctypes                 # For autodetecting the user's language (3/3)
 
 # Configuration
 mod_pretty_name = 'Isaac Racing Mods'
@@ -316,7 +320,8 @@ class ModSelectionWindow():
         row = 0
 
         # Select a mod
-        select_message = tkinter.Message(self.window, justify=tkinter.CENTER, text='Select a mod:', font='font 20', width=400)
+        text = get_text('Select a mod') + ':'
+        select_message = tkinter.Message(self.window, justify=tkinter.CENTER, text=text, font='font 20', width=400)
         select_message.grid(row=row, pady=5)
         row += 1
 
@@ -354,17 +359,40 @@ class ModSelectionWindow():
         row += 1
 
         # "Miscellaneous Stuff" button
-        miscellaneous_button = tkinter.Button(self.window, text=' Miscellaneous Stuff (4) ', compound='left', font='font 15')
+        text = ' ' + get_text('Miscellaneous Stuff') + ' (4) '
+        miscellaneous_button = tkinter.Button(self.window, text=text, compound='left', font='font 15')
         miscellaneous_button.configure(command=self.show_miscellaneous_window)
         miscellaneous_button.grid(row=row, pady=5)
         self.window.bind('4', lambda event: miscellaneous_button.invoke())
         row += 1
 
         # "Exit" button
-        exit_button = tkinter.Button(self.window, text=' Exit (5) ', compound='left', font='font 15')
+        text = ' ' + get_text('Exit') + ' (Esc) '
+        exit_button = tkinter.Button(self.window, text=text, compound='left', font='font 15')
         exit_button.configure(command=self.exit)
         exit_button.grid(row=row, pady=5)
-        self.window.bind('5', lambda event: uninstall_mod(self))  # Won't work with "exit_button.invoke()"
+        self.window.bind('<Escape>', lambda event: uninstall_mod(self))  # Won't work with "exit_button.invoke()"
+        row += 1
+
+        # Spacing
+        spacing = tkinter.Message(self.window, text='', font='font 12')
+        spacing.grid(row=row)
+        row += 1
+
+        # "English" language checkbox
+        self.language_en = tkinter.IntVar()
+        if language == 'en':
+            self.language_en.set(1)
+        self.language_en_checkbox = tkinter.Checkbutton(self.window, text='English', font='font 14', variable=self.language_en, command=self.set_language_en)
+        self.language_en_checkbox.grid(row=row)
+        row += 1
+
+        # "Français" language checkbox
+        self.language_fr = tkinter.IntVar()
+        if language == 'fr':
+            self.language_fr.set(1)
+        self.language_fr_checkbox = tkinter.Checkbutton(self.window, text='Français', font='font 14', variable=self.language_fr, command=self.set_language_fr)
+        self.language_fr_checkbox.grid(row=row)
         row += 1
 
         # Spacing
@@ -396,6 +424,48 @@ class ModSelectionWindow():
         self.window.destroy()
         MiscellaneousWindow(self.parent)
 
+    def set_language_en(self):
+        # Global variables
+        global mod_options
+        global language
+
+        # Write the new language to the INI file
+        mod_options.set('options', 'language', 'en')
+        try:
+            with open(os.path.join('..', 'options.ini'), 'w') as config_file:
+                mod_options.write(config_file)
+        except Exception as e:
+            error('Failed to write the new "language" value to the "options.ini" file:', e)
+
+        # Change the global variable for the language
+        language = 'en'
+
+        # Respawn the main menu
+        get_window_x_y(self)
+        self.window.destroy()
+        ModSelectionWindow(self.parent)
+
+    def set_language_fr(self):
+        # Global variables
+        global mod_options
+        global language
+
+        # Write the new language to the INI file
+        mod_options.set('options', 'language', 'fr')
+        try:
+            with open(os.path.join('..', 'options.ini'), 'w') as config_file:
+                mod_options.write(config_file)
+        except Exception as e:
+            error('Failed to write the new "language" value to the "options.ini" file:', e)
+
+        # Change the global variable for the language
+        language = 'fr'
+
+        # Respawn the main menu
+        get_window_x_y(self)
+        self.window.destroy()
+        ModSelectionWindow(self.parent)
+
     def exit(self):
         get_window_x_y(self)
         uninstall_mod(self)
@@ -420,7 +490,8 @@ class Jud6sWindow():
         row = 0
 
         # Select a mod
-        select_message = tkinter.Message(self.window, justify=tkinter.CENTER, text='Select a ruleset:', font='font 20', width=400)
+        text = get_text('Select a ruleset') + ':'
+        select_message = tkinter.Message(self.window, justify=tkinter.CENTER, text=text, font='font 20', width=400)
         select_message.grid(row=row, pady=5)
         row += 1
 
@@ -505,21 +576,25 @@ class Jud6sWindow():
         row += 1
 
         # "Go Back" button
-        go_back_button = tkinter.Button(self.window, text=' Go Back (9) ', compound='left')
+        text = ' ' + get_text('Go Back') + ' (Esc) '
+        go_back_button = tkinter.Button(self.window, text=text, compound='left')
         go_back_button.configure(font=('Helvetica', 13))
         go_back_button.configure(command=self.go_back)
         go_back_button.grid(row=row, pady=25)
-        self.window.bind('9', lambda event: go_back_button.invoke())
+        self.window.bind('<Escape>', lambda event: go_back_button.invoke())
         row += 1
 
         # Instructions
-        m = tkinter.Message(self.window, justify=tkinter.CENTER, text='Isaac will open when you start the mod.', font='font 13', width=400)
+        text = get_text('Isaac will open')
+        m = tkinter.Message(self.window, justify=tkinter.CENTER, text=text, font='font 13', width=400)
         m.grid(row=row)
         row += 1
-        m = tkinter.Message(self.window, justify=tkinter.CENTER, text='Keep this program open while playing.', font='font 13', width=400)
+        text = get_text('Keep this program open')
+        m = tkinter.Message(self.window, justify=tkinter.CENTER, text=text, font='font 13', width=400)
         m.grid(row=row)
         row += 1
-        m = tkinter.Message(self.window, justify=tkinter.CENTER, text='Isaac will return to normal when this program is closed.\n', font='font 13', width=400)
+        text = get_text('Isaac will return to normal') + '\n'
+        m = tkinter.Message(self.window, justify=tkinter.CENTER, text=text, font='font 13', width=400)
         m.grid(row=row)
         row += 1
 
@@ -647,7 +722,7 @@ class Jud6sWindow():
 
             # The custom starting items
             copy_file('jud6s-extra/' + ruleset_name + '/players.xml', os.path.join(isaac_resources_directory, 'players.xml'))
-            
+
             # The ruleset name is too long for the title screen, so make it shorter
             ruleset_name = 'Pageant Boy Tourney'
 
@@ -655,7 +730,7 @@ class Jud6sWindow():
         if ruleset != 1:
             title_img = Image.open('images/main-menu/titlemenu-base.png')
             title_draw = ImageDraw.Draw(title_img)
- 
+
             title_screen_text = 'Jud6s Mod ' + jud6s_version
             large_font = ImageFont.truetype('fonts/IsaacSans.ttf', 19)
             w, h = title_draw.textsize(title_screen_text, font=large_font)
@@ -704,8 +779,17 @@ class InstantStartWindow():
         m.grid(row=row)
         row += 1
 
+        # Button width
+        if language == 'en':
+            button_width = 250
+        elif language == 'fr':
+            button_width = 300
+        else:
+            button_width = 250
+
         # "Choose a Start" button
-        choose_start_button = tkinter.Button(self.window, text=' Choose a Start (1) ', compound='left', font='font 16', width=250)
+        text = ' ' + get_text('Choose a Start') + ' (1) '
+        choose_start_button = tkinter.Button(self.window, text=text, compound='left', font='font 16', width=button_width)
         choose_start_button.configure(command=self.show_start_selector_window)
         choose_start_button.icon = ImageTk.PhotoImage(get_item_icon('More Options'))
         choose_start_button.configure(image=choose_start_button.icon)
@@ -714,7 +798,8 @@ class InstantStartWindow():
         row += 1
 
         # "Random Start" button
-        random_start_button = tkinter.Button(self.window, text=' Random Start (2) ', compound='left', font='font 16', width=250)
+        text = ' ' + get_text('Random Start') + ' (2) '
+        random_start_button = tkinter.Button(self.window, text=text, compound='left', font='font 16', width=button_width)
         random_start_button.configure(command=self.get_random_start)
         random_start_button.icon = ImageTk.PhotoImage(get_item_icon('???'))
         random_start_button.configure(image=random_start_button.icon)
@@ -743,7 +828,8 @@ class InstantStartWindow():
 
         # LCO checkbox
         self.LCO_mode = tkinter.IntVar()
-        LCO_checkbox = tkinter.Checkbutton(self.window, anchor=tkinter.E, text='Lost Child Open (5)', font='font 14', variable=self.LCO_mode)
+        text = get_text('Lost Child Open') + ' (5)'
+        LCO_checkbox = tkinter.Checkbutton(self.window, anchor=tkinter.E, text=text, font='font 14', variable=self.LCO_mode)
         LCO_checkbox.grid(row=row)
         self.window.bind('5', lambda event: LCO_checkbox.invoke())
         row += 1
@@ -756,21 +842,25 @@ class InstantStartWindow():
         row += 1
 
         # "Go Back" button
-        go_back_button = tkinter.Button(self.window, text=' Go Back (7) ', compound='left')
+        text = ' ' + get_text('Go Back') + ' (Esc) '
+        go_back_button = tkinter.Button(self.window, text=text, compound='left')
         go_back_button.configure(font=('Helvetica', 13))
         go_back_button.configure(command=self.go_back)
         go_back_button.grid(row=row, pady=25)
-        self.window.bind('7', lambda event: go_back_button.invoke())
+        self.window.bind('<Escape>', lambda event: go_back_button.invoke())
         row += 1
 
         # Instructions
-        m = tkinter.Message(self.window, justify=tkinter.CENTER, text='Isaac will open when you start the mod.', font='font 13', width=400)
+        text = get_text('Isaac will open')
+        m = tkinter.Message(self.window, justify=tkinter.CENTER, text=text, font='font 13', width=400)
         m.grid(row=row)
         row += 1
-        m = tkinter.Message(self.window, justify=tkinter.CENTER, text='Keep this program open while playing.', font='font 13', width=400)
+        text = get_text('Keep this program open')
+        m = tkinter.Message(self.window, justify=tkinter.CENTER, text=text, font='font 13', width=400)
         m.grid(row=row)
         row += 1
-        m = tkinter.Message(self.window, justify=tkinter.CENTER, text='Isaac will return to normal when this program is closed.\n', font='font 13', width=400)
+        text = get_text('Isaac will return to normal') + '\n'
+        m = tkinter.Message(self.window, justify=tkinter.CENTER, text=text, font='font 13', width=400)
         m.grid(row=row)
         row += 1
 
@@ -1037,12 +1127,14 @@ class InstantStartWindow():
         # Start to build the GUI window
         hearts_list = get_heart_icons()
         hud_list = get_hud_icons()
-        tkinter.Label(image_box, text='Click a build to play it', font='font 32 bold').grid(row=row, pady=5)
+        text = get_text('Click a build to play it')
+        tkinter.Label(image_box, text=text, font='font 32 bold').grid(row=row, pady=5)
         row += 1
 
         # Search label
         search_widget_space = tkinter.Label(image_box)
-        search_label = tkinter.Label(search_widget_space, text='Search: ', font=('Helvetica', 15))
+        text = get_text('Search') + ': '
+        search_label = tkinter.Label(search_widget_space, text=text, font=('Helvetica', 15))
         search_label.grid(row=0, column=0)
 
         # Search text box
@@ -1056,7 +1148,8 @@ class InstantStartWindow():
         row += 1
 
         # "Go Back" button
-        go_back_button = tkinter.Button(image_box, text=' Go Back (Esc)', compound='left')
+        text = ' ' + get_text('Go Back') + ' (Esc) '
+        go_back_button = tkinter.Button(image_box, text=text, compound='left')
         go_back_button.configure(font=('Helvetica', 11))
         go_back_button.configure(command=go_back)  # Goes to nested function, not class function
         go_back_button.grid(row=row, pady=15)
@@ -1073,27 +1166,32 @@ class InstantStartWindow():
             if index == 0:
                 tkinter.Message(image_box, text='', font='font 12').grid(row=row)  # Spacing
                 row += 1
-                tkinter.Label(image_box, text='Treasure Room Starts', font='font 20 bold').grid(row=row, pady=5)
+                text = get_text('Treasure Room Starts')
+                tkinter.Label(image_box, text=text, font='font 20 bold').grid(row=row, pady=5)
                 row += 1
             elif index == 19:
                 tkinter.Message(image_box, text='', font='font 12').grid(row=row)  # Spacing
                 row += 1
-                tkinter.Label(image_box, text='Devil Room Starts', font='font 20 bold').grid(row=row, pady=5)
+                text = get_text('Devil Room Starts')
+                tkinter.Label(image_box, text=text, font='font 20 bold').grid(row=row, pady=5)
                 row += 1
             elif index == 22:
                 tkinter.Message(image_box, text='', font='font 12').grid(row=row)  # Spacing
                 row += 1
-                tkinter.Label(image_box, text='Angel Room Starts', font='font 20 bold').grid(row=row, pady=5)
+                text = get_text('Angel Room Starts')
+                tkinter.Label(image_box, text=text, font='font 20 bold').grid(row=row, pady=5)
                 row += 1
             elif index == 25:
                 tkinter.Message(image_box, text='', font='font 12').grid(row=row)  # Spacing
                 row += 1
-                tkinter.Label(image_box, text='Custom Starts (with the D6)', font='font 20 bold').grid(row=row, pady=5)
+                text = get_text('Custom Starts (with the D6)')
+                tkinter.Label(image_box, text=text, font='font 20 bold').grid(row=row, pady=5)
                 row += 1
             elif index == 29:
                 tkinter.Message(image_box, text='', font='font 12').grid(row=row)  # Spacing
                 row += 1
-                tkinter.Label(image_box, text='Custom Starts (without the D6)', font='font 20 bold').grid(row=row, pady=5)
+                text = get_text('Custom Starts (without the D6)')
+                tkinter.Label(image_box, text=text, font='font 20 bold').grid(row=row, pady=5)
                 row += 1
 
             # Background color
@@ -1470,7 +1568,7 @@ class InstantStartWindow():
                 'The Ladder'
             ]
             for item in removed_shop_items:
-                remove_item_from_shop_pool(item)        
+                remove_item_from_shop_pool(item)
 
             added_shop_items = [
                 'Steven',
@@ -1481,7 +1579,7 @@ class InstantStartWindow():
                 'Cupid\'s Arrow'
             ]
             for item in added_shop_items:
-                add_item_to_shop_pool(item)        
+                add_item_to_shop_pool(item)
 
         # Write the changes to the copied over XML files
         players_xml.write(os.path.join(isaac_resources_directory, 'players.xml'))
@@ -1596,7 +1694,8 @@ class DiversityWindow():
         row += 1
 
         # "Enter seed" label
-        enter_seed_label = tkinter.Label(dmbox, text='Enter seed (case sensitive):', font='font 14')
+        text = get_text('Enter a seed') + ':'
+        enter_seed_label = tkinter.Label(dmbox, text=text, font='font 14')
         enter_seed_label.grid(row=row2, column=0, pady=10)
 
         # "New Random Seed" button
@@ -1639,7 +1738,8 @@ class DiversityWindow():
         row2 += 1
 
         # "Start Diversity Mod" button
-        start_diversity_mod_button = tkinter.Button(self.window, font='font 16', text='   Start Diversity Mod   ', compound='left')
+        text = '   ' + get_text('Start Diversity Mod') + '   '
+        start_diversity_mod_button = tkinter.Button(self.window, font='font 16', text=text, compound='left')
         start_diversity_mod_button.configure(command=self.install_diversity_mod)
         start_diversity_mod_button.icon = ImageTk.PhotoImage(Image.open('images/diversity/rainbow.png'))
         start_diversity_mod_button.configure(image=start_diversity_mod_button.icon)
@@ -1647,20 +1747,25 @@ class DiversityWindow():
         row += 1
 
         # "Go Back" button
-        go_back_button = tkinter.Button(self.window, text=' Go Back ', compound='left')
+        text = ' ' + get_text('Go Back') + ' (Esc) '
+        go_back_button = tkinter.Button(self.window, text=text, compound='left')
         go_back_button.configure(font=('Helvetica', 13))
         go_back_button.configure(command=self.go_back)
         go_back_button.grid(row=row, column=0, pady=25)
+        self.window.bind('<Escape>', lambda event: go_back_button.invoke())
         row += 1
 
         # Instructions
-        m = tkinter.Message(self.window, justify=tkinter.CENTER, text='Isaac will open when you start the mod.', font='font 13', width=400)
+        text = get_text('Isaac will open')
+        m = tkinter.Message(self.window, justify=tkinter.CENTER, text=text, font='font 13', width=400)
         m.grid(row=row, column=0)
         row += 1
-        m = tkinter.Message(self.window, justify=tkinter.CENTER, text='Keep this program open while playing.', font='font 13', width=400)
+        text = get_text('Keep this program open')
+        m = tkinter.Message(self.window, justify=tkinter.CENTER, text=text, font='font 13', width=400)
         m.grid(row=row, column=0)
         row += 1
-        m = tkinter.Message(self.window, justify=tkinter.CENTER, text='Isaac will return to normal when this program is closed.\n', font='font 13', width=400)
+        text = get_text('Isaac will return to normal') + '\n'
+        m = tkinter.Message(self.window, justify=tkinter.CENTER, text=text, font='font 13', width=400)
         m.grid(row=row, column=0)
         row += 1
 
@@ -1910,7 +2015,8 @@ class MiscellaneousWindow():
         row = 0
 
         # "Select an option" label
-        select_message = tkinter.Message(self.window, justify=tkinter.CENTER, text='Select an option:', font='font 20', width=400)
+        text = get_text('Select an option') + ':'
+        select_message = tkinter.Message(self.window, justify=tkinter.CENTER, text=text, font='font 20', width=400)
         select_message.grid(row=row, pady=5, padx=100)  # Widen the window
         row += 1
 
@@ -1923,7 +2029,8 @@ class MiscellaneousWindow():
         self.remove_boss_cutscenes_mode = tkinter.IntVar()
         if remove_boss_cutscenes == True:
             self.remove_boss_cutscenes_mode.set(1)
-        self.remove_boss_cutscenes_checkbox = tkinter.Checkbutton(self.window, text='Remove boss cutscenes (1)', font='font 14', variable=self.remove_boss_cutscenes_mode, command=self.remove_boss_cutscenes_checked)
+        text = get_text('Remove boss cutscenes') + ' (1)'
+        self.remove_boss_cutscenes_checkbox = tkinter.Checkbutton(self.window, text=text, font='font 14', variable=self.remove_boss_cutscenes_mode, command=self.remove_boss_cutscenes_checked)
         self.remove_boss_cutscenes_checkbox.grid(row=row)
         self.window.bind('1', lambda event: self.remove_boss_cutscenes_checkbox.invoke())
         row += 1
@@ -1932,7 +2039,8 @@ class MiscellaneousWindow():
         self.close_isaac_mode = tkinter.IntVar()
         if automatically_close_isaac == True:
             self.close_isaac_mode.set(1)
-        self.close_isaac_checkbox = tkinter.Checkbutton(self.window, text='Automatically attempt to close Isaac (2)', font='font 14', variable=self.close_isaac_mode, command=self.close_isaac_checkbox_checked)
+        text = get_text('Automatically attempt to close Isaac') + ' (2)'
+        self.close_isaac_checkbox = tkinter.Checkbutton(self.window, text=text, font='font 14', variable=self.close_isaac_mode, command=self.close_isaac_checkbox_checked)
         self.close_isaac_checkbox.grid(row=row)
         self.window.bind('2', lambda event: self.close_isaac_checkbox.invoke())
         row += 1
@@ -1943,35 +2051,39 @@ class MiscellaneousWindow():
         row += 1
 
         # "Open Isaac game directory" button
-        open1_button = tkinter.Button(self.window, text=' Open Isaac game directory (3) ', compound='left')
-        open1_button.configure(font=('Helvetica', 13, 'bold'))
+        text = ' ' + get_text('Open Isaac game directory') + ' (3) '
+        open1_button = tkinter.Button(self.window, text=text, compound='left')
+        open1_button.configure(font=('Helvetica', 13))
         open1_button.configure(command=self.open1)
         open1_button.grid(row=row, pady=5)
         self.window.bind('3', lambda event: self.open1())
         row += 1
 
         # "Open Isaac documents directory" button
-        open2_button = tkinter.Button(self.window, text=' Open Isaac documents directory (4) ', compound='left')
-        open2_button.configure(font=('Helvetica', 13, 'bold'))
+        text = ' ' + get_text('Open Isaac documents directory') + ' (4) '
+        open2_button = tkinter.Button(self.window, text=text, compound='left')
+        open2_button.configure(font=('Helvetica', 13))
         open2_button.configure(command=self.open2)
         open2_button.grid(row=row, pady=5)
         self.window.bind('4', lambda event: self.open2())
         row += 1
 
         # "Uninstall all existing mods" button
-        uninstall_button = tkinter.Button(self.window, text=' Uninstall all existing mods (5) ', compound='left')
-        uninstall_button.configure(font=('Helvetica', 13, 'bold'))
+        text = ' ' + get_text('Uninstall all existing mods') + ' (5) '
+        uninstall_button = tkinter.Button(self.window, text=text, compound='left')
+        uninstall_button.configure(font=('Helvetica', 13))
         uninstall_button.configure(command=self.uninstall_all)
         uninstall_button.grid(row=row, pady=5)
         self.window.bind('5', lambda event: self.uninstall_all())
         row += 1
 
         # "Go Back" button
-        go_back_button = tkinter.Button(self.window, text=' Go Back (6) ', compound='left')
+        text = ' ' + get_text('Go Back') + ' (Esc) '
+        go_back_button = tkinter.Button(self.window, text=text, compound='left')
         go_back_button.configure(font=('Helvetica', 13))
         go_back_button.configure(command=self.go_back)
         go_back_button.grid(row=row, pady=25)
-        self.window.bind('6', lambda event: go_back_button.invoke())
+        self.window.bind('<Escape>', lambda event: go_back_button.invoke())
         row += 1
 
         # Spacing
@@ -2109,7 +2221,7 @@ def get_image(path):
     if image is None:
         canonicalized_path = path.replace('/', os.sep).replace('\\', os.sep)
         image = Image.open(canonicalized_path)
-        
+
         # Crop the image to 32x32 (A Dollar, A Quarter, and Money = Power have hidden text outside of the 32x32)
         image = image.crop((0, 0, 32, 32))
 
@@ -2243,6 +2355,14 @@ def purge_resources_directory(self):
         warning('It appears that your resources folder is already clean; there were no custom mods installed before you opened ' + mod_pretty_name + '.', None)
 
 
+###################################
+# Language text retrieval function
+###################################
+
+def get_text(text):
+    return languages.text[text][language]
+
+
 ################
 # Main function
 ################
@@ -2256,6 +2376,7 @@ def main():
     global window_y
     global remove_boss_cutscenes
     global automatically_close_isaac
+    global language
     global jud6s_version
     global config_ini_exists
     global backed_up_resources_directory
@@ -2288,6 +2409,8 @@ def main():
         error('The "options.ini" file does not contain a "remove_boss_cutscenes" entry. Try adding "remove_boss_cutscenes = true" or redownloading the program.', None)
     if 'automatically_close_isaac' not in mod_options['options']:
         error('The "options.ini" file does not contain an "automatically_close_isaac" entry. Try adding "automatically_close_isaac = true" or redownloading the program.', None)
+    if 'language' not in mod_options['options']:
+        error('The "options.ini" file does not contain an "language" entry. Try adding "language = autodetect" or redownloading the program.', None)
 
     # Get variables from the "options.ini" file
     mod_version = mod_options['options']['mod_version']
@@ -2309,6 +2432,20 @@ def main():
         automatically_close_isaac = False
     else:
         error('The "options.ini" value for "automatically_close_isaac" is not set to true or false.', None)
+    language = mod_options['options']['language']
+    if language != 'autodetect' and language != 'en' and language != 'fr':
+        error('The "options.ini" value for "automatically_close_isaac" is not set to a valid language.', None)
+    if language == 'autodetect':
+        # Find the user's locale, from: http://stackoverflow.com/questions/3425294/how-to-detect-the-os-default-language-in-python
+        if platform.system() == 'Windows':
+            lang_identifier = locale.windows_locale[ctypes.windll.kernel32.GetUserDefaultUILanguage()]
+        else:
+            lang_identifier = locale.getdefaultlocale()[0]
+        if lang_identifier == 'fr_FR':
+            language = 'fr'
+        else:
+            # Default to English
+            language = 'en'
 
     # Get the version number of the Jud6s mod (which is different than the version number of the racing mod pack)
     try:

@@ -23,9 +23,12 @@ mod_options = configparser.ConfigParser()
 mod_options.read('options.ini')
 mod_version = mod_options['options']['mod_version']
 
-# Set the window_x and window_y to a reasonable standard value
+# Make sure the options.ini file is set to the proper default values
 mod_options.set('options', 'window_x', '50')
 mod_options.set('options', 'window_y', '50')
+mod_options.set('options', 'remove_boss_cutscenes', 'true')
+mod_options.set('options', 'automatically_close_isaac', 'true')
+mod_options.set('options', 'language', 'autodetect')
 with open('options.ini', 'w') as config_file:
     mod_options.write(config_file)
 

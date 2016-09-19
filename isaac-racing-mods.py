@@ -22,6 +22,9 @@ import time                # For slowing down the spinning animation
 import threading           # For spawning a new thread to do the update work in (1/2)
 import queue               # For spawning a new thread to do the update work in (2/2)
 from PIL import Image, ImageTk  # For rotating the dice
+import platform               # For autodetecting the user's language (1/3)
+import locale                 # For autodetecting the user's language (2/3)
+import ctypes                 # For autodetecting the user's language (3/3)
 
 # Configuration
 mod_pretty_name = 'Isaac Racing Mods'
@@ -135,22 +138,27 @@ class NewVersion():
         self.action = action
         if self.action == 'update_updater':
             # "A new version" message
-            new_version_message = tkinter.Message(self.window, justify=tkinter.CENTER, font='font 10', text='A new version of ' + mod_pretty_name + ' has been released.', width=600)
+            text = get_text('A new version of') + ' ' + mod_pretty_name + ' ' + get_text('has been released.')
+            new_version_message = tkinter.Message(self.window, justify=tkinter.CENTER, font='font 10', text=text, width=600)
             new_version_message.grid(row=0, pady=10)
         elif self.action == 'update_mod':
             # "Version X.X.X has been released" message
-            new_version_message = tkinter.Message(self.window, justify=tkinter.CENTER, font='font 10', text='Version ' + latest_version + ' of ' + mod_pretty_name + ' has been released.\n(You are currently running version ' + mod_version + '.)', width=600)
+            text = get_text('Version') + ' ' + latest_version + ' ' + get_text('of') + ' ' + mod_pretty_name + ' ' + get_text('has been released.') + '\n'
+            text += '(' + get_text('You are currently running version') + ' ' + mod_version + '.)'
+            new_version_message = tkinter.Message(self.window, justify=tkinter.CENTER, font='font 10', text=text, width=600)
             new_version_message.grid(row=0, pady=10)
         else:
             error('The "NewVersion" class was called without a valid action.', None)
 
         # "Automatically update and launch the new version" button
-        update_button = tkinter.Button(self.window, font='font 12', text='Automatically update and launch the new version')
+        text = get_text('Automatically update and launch the new version')
+        update_button = tkinter.Button(self.window, font='font 12', text=text)
         update_button.configure(command=self.update_button_function)
         update_button.grid(row=1, pady=10, padx=20)
 
         # "Launch the old version" button
-        old_version_button = tkinter.Button(self.window, font='font 12', text='Launch the old version', command=parent.quit)
+        text = get_text('Launch the old version')
+        old_version_button = tkinter.Button(self.window, font='font 12', text=text, command=parent.quit)
         old_version_button.grid(row=2, pady=10)
 
         # Place the window at the X and Y coordinates from either the INI or the previous window
@@ -170,7 +178,8 @@ class NewVersion():
         self.window.protocol('WM_DELETE_WINDOW', lambda: close_mod(self))
 
         # Updating message
-        updating_message = tkinter.Message(self.window, justify=tkinter.CENTER, font='font 40', text='Updating...', width=600)
+        text = get_text('Updating') + '...'
+        updating_message = tkinter.Message(self.window, justify=tkinter.CENTER, font='font 40', text=text, width=600)
         updating_message.pack()
 
         # Rotating dice
@@ -405,6 +414,55 @@ def close_mod(self):
     sys.exit()
 
 
+###################################
+# Language text retrieval function
+###################################
+
+def get_text(text):
+    languages = {
+        'A new version of': {
+            'en': 'A new version of',
+            'fr': 'Une version de',
+        },
+        'has been released.': {
+            'en': 'has been released.',
+            'fr': 'est disponible.',
+        },
+        'Version': {
+            'en': 'Version',
+            'fr': 'Version',
+        },
+        'You are currently running version': {
+            'en': 'You are currently running version',
+            'fr': 'Vous utilisez actuellement la version',
+        },
+        'of': {
+            'en': 'of',
+            'fr': 'de',
+        },
+        'Automatically update and launch the new version': {
+            'en': 'Automatically update and launch the new version',
+            'fr': 'Mettre à jour automatiquement et lancer la nouvelle version',
+        },
+        'Launch the old version': {
+            'en': 'Launch the old version',
+            'fr': 'Lancer l\'ancienne version',
+        },
+        'Updating': {
+            'en': 'Updating',
+            'fr': 'Mise à jour',
+        },
+
+        # Template
+        '': {
+            'en': '',
+            'fr': '',
+        },
+    }
+    return languages[text][language]
+
+
+
 ################
 # Main function
 ################
@@ -415,6 +473,7 @@ def main():
     global mod_version
     global window_x
     global window_y
+    global language
     global latest_version
 
     # TkInter callbacks run in different threads, so if we want to handle generic exceptions caused in a TkInter callback, we must define a specific custom exception handler for that
@@ -439,6 +498,8 @@ def main():
         error('The "options.ini" file does not contain an entry for the X position of your window. Try adding "window_x = 50" or redownloading the program.', None)
     if 'window_y' not in mod_options['options']:
         error('The "options.ini" file does not contain an entry for the Y position of your window. Try adding "window_y = 50" or redownloading the program.', None)
+    if 'language' not in mod_options['options']:
+        error('The "options.ini" file does not contain an "language" entry. Try adding "language = autodetect" or redownloading the program.', None)
 
     # Get variables from the "options.ini" file
     mod_updater_version = mod_options['options']['mod_updater_version']
@@ -446,6 +507,20 @@ def main():
     root.title(mod_pretty_name + ' v' + mod_version)  # Set the GUI title again now that we know the version
     window_x = int(mod_options['options']['window_x'])
     window_y = int(mod_options['options']['window_y'])
+    language = mod_options['options']['language']
+    if language != 'autodetect' and language != 'en' and language != 'fr':
+        error('The "options.ini" value for "automatically_close_isaac" is not set to a valid language.', None)
+    if language == 'autodetect':
+        # Find the user's locale, from: http://stackoverflow.com/questions/3425294/how-to-detect-the-os-default-language-in-python
+        if platform.system() == 'Windows':
+            lang_identifier = locale.windows_locale[ctypes.windll.kernel32.GetUserDefaultUILanguage()]
+        else:
+            lang_identifier = locale.getdefaultlocale()[0]
+        if lang_identifier == 'fr_FR':
+            language = 'fr'
+        else:
+            # Default to English
+            language = 'en'
 
     # Check to see what the latest version of the mod is
     try:
@@ -476,7 +551,7 @@ def main():
         warning('Failed to check GitHub for the latest version:', e)
         latest_version = mod_version
         latest_updater_version = mod_updater_version
-        
+
     # There is a new version of the updater, so ask the user if they want to automatically update
     if mod_updater_version != latest_updater_version:
         NewVersion(root, 'update_updater')
