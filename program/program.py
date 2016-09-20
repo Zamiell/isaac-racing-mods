@@ -2456,10 +2456,16 @@ def main():
 
     # Check to see if the resources directory exists
     if not os.path.isdir(isaac_resources_directory):
-        unable_to_find_message = tkinter.Message(root, justify=tkinter.CENTER, font='font 10', text=mod_pretty_name + ' was unable to find your Isaac resources directory.\nNavigate to the program "isaac-ng.exe" in your Steam directory.', width=600)
+        text = ''
+        if language == 'fr':
+            text += 'L\''
+        text += mod_pretty_name + ' ' + get_text('was unable to find your Isaac resources directory.' + '\n')
+        text += get_text('Navigate to the program "isaac-ng.exe" in your Steam directory.')
+        unable_to_find_message = tkinter.Message(root, justify=tkinter.CENTER, font='font 10', text=text, width=600)
         unable_to_find_message.grid(row=0, pady=10)
 
-        navigate_button = tkinter.Button(root, font='font 12', text='Navigate to "isaac-ng.exe"', command=set_custom_path)
+        text = get_text('Navigate to "isaac-ng.exe"')
+        navigate_button = tkinter.Button(root, font='font 12', text=text, command=set_custom_path)
         navigate_button.grid(row=2, pady=10)
 
         example_message = tkinter.Message(root, justify=tkinter.LEFT, font='font 10', text='Example location:\nC:\Program Files (x86)\Steam\steamapps\common\The Binding of Isaac Rebirth\isaac-ng.exe', width=800)

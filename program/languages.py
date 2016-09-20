@@ -115,6 +115,18 @@ text = {
         'en': 'Go Back',
         'fr': 'Retour',
     },
+    'was unable to find your Isaac resources directory.': {
+        'en': 'was unable to find your Isaac resources directory.',
+        'fr': 'n\'a pas pu trouver le répertoire des ressources d\'Isaac.',
+    },
+    'Navigate to the program "isaac-ng.exe" in your Steam directory.': {
+        'en': 'Navigate to the program "isaac-ng.exe" in your Steam directory.',
+        'fr': 'Naviguez vers le programme "isaac-ng.exe" dans votre répertoire Steam.',
+    },
+    'Navigate to "isaac-ng.exe"': {
+        'en': 'Navigate to "isaac-ng.exe"',
+        'fr': 'Naviguer vers "isaac-ng.exe"',
+    },
 
     # Template
     '': {
