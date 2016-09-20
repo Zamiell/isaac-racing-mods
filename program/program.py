@@ -54,7 +54,8 @@ def error(message, exception):
         file.write('\n')
 
     # Show the error to the user
-    tkinter.messagebox.showerror('Error', message)
+    title = get_text('Error')
+    tkinter.messagebox.showerror(title, message)
 
     # Exit the program immediately
     sys.exit()
@@ -75,12 +76,13 @@ def warning(message, exception):
         file.write('\n')
 
     # Show the warning to the user
-    tkinter.messagebox.showwarning('Warning', message)
+    title = get_text('Warning')
+    tkinter.messagebox.showwarning(title, message)
 
 
 def callback_error(self, *args):
     # Build the error message
-    message = 'Generic error:\n\n'
+    message = get_text('Generic error') + ':\n\n'
     message += traceback.format_exc()
 
     # Print the message to standard out
@@ -92,7 +94,8 @@ def callback_error(self, *args):
         file.write('\n')
 
     # Show the error to the user
-    tkinter.messagebox.showerror('Error', message)
+    title = get_text('Error')
+    tkinter.messagebox.showerror(title, message)
 
     # Exit the program immediately
     sys.exit()
@@ -159,7 +162,8 @@ def set_custom_path():
 
     # Check that the file is isaac-ng.exe
     if user_entered_isaac_location[-12:] != 'isaac-ng.exe':
-        error('The file you selected is not called "isaac-ng.exe".', None)
+        text = get_text('The file you selected is not called "isaac-ng.exe".')
+        error(text, None)
 
     # Check that the file exists
     if not os.path.isfile(user_entered_isaac_location):

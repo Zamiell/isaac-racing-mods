@@ -115,6 +115,20 @@ text = {
         'en': 'Go Back',
         'fr': 'Retour',
     },
+
+    # Errors and warnings
+    'Error': {
+        'en': 'Error',
+        'fr': 'Erreur',
+    },
+    'Warning': {
+        'en': 'Warning',
+        'fr': 'Attention',
+    },
+    'Generic error': {
+        'en': 'Generic error',
+        'fr': 'Erreur générique',
+    },
     'was unable to find your Isaac resources directory.': {
         'en': 'was unable to find your Isaac resources directory.',
         'fr': 'n\'a pas pu trouver le répertoire des ressources d\'Isaac.',
@@ -130,6 +144,10 @@ text = {
     'Example location': {
         'en': 'Example location',
         'fr': 'Exemple de location',
+    },
+    'The file you selected is not called "isaac-ng.exe".': {
+        'en': 'The file you selected is not called "isaac-ng.exe".',
+        'fr': 'Le fichier que vous avez sélectionné ne se nomme pas "Isaac-ng.exe".',
     },
     'Success': {
         'en': 'Success',

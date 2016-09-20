@@ -18,6 +18,11 @@ mod_name = 'isaac-racing-mods'
 #mod_name = 'isaac-test'
 pyinstaller_path = 'C:\Python34\Scripts\pyinstaller.exe'
 
+# Subroutines
+def error(message):
+    print(message)
+    sys.exit(1)
+
 # Get the version number of the mod from options.ini
 mod_options = configparser.ConfigParser()
 mod_options.read('options.ini')
@@ -65,9 +70,15 @@ if os.path.exists('release'):
 if not os.path.isfile(pyinstaller_path):
     print('Error: Edit this file and specify the path to your pyinstaller.exe file.')
     exit(1)
-subprocess.call([pyinstaller_path, '--onefile', '--windowed', '--icon=images/the_d6.ico', mod_name + '.py'])
-subprocess.call([pyinstaller_path, '--onefile', '--windowed', '--icon=images/the_d6.ico', 'program/program.py'])
-subprocess.call([pyinstaller_path, '--onefile', '--windowed', '--icon=images/the_d6.ico', mod_name + '-standalone-updater.py'])
+return_code = subprocess.call([pyinstaller_path, '--onefile', '--windowed', '--icon=images/the_d6.ico', mod_name + '.py'])
+if return_code != 0:
+    error('Failed to freeze "' + mod_name + '.py".')
+return_code = subprocess.call([pyinstaller_path, '--onefile', '--windowed', '--icon=images/the_d6.ico', 'program/program.py'])
+if return_code != 0:
+    error('Failed to freeze "program.py".')
+return_code = subprocess.call([pyinstaller_path, '--onefile', '--windowed', '--icon=images/the_d6.ico', mod_name + '-standalone-updater.py'])
+if return_code != 0:
+    error('Failed to freeze "' + mod_name + '-standalone-updater.py".')
 
 # Clean up
 shutil.rmtree('__pycache__')
