@@ -181,7 +181,9 @@ def set_custom_path():
         error('Failed to write the new directory path to the "options.ini" file:', e)
 
     # Alert the user
-    tkinter.messagebox.showinfo('Success', 'You have successfully set your Isaac resources directory. Click OK to restart ' + mod_pretty_name + '.')
+    text1 = get_text('Success')
+    text2 = get_text('You have successfully set') + mod_pretty_name + '.'
+    tkinter.messagebox.showinfo(text1, text2)
 
     # Restart the program
     try:
@@ -2459,7 +2461,7 @@ def main():
         text = ''
         if language == 'fr':
             text += 'L\''
-        text += mod_pretty_name + ' ' + get_text('was unable to find your Isaac resources directory.' + '\n')
+        text += mod_pretty_name + ' ' + get_text('was unable to find your Isaac resources directory.') + '\n'
         text += get_text('Navigate to the program "isaac-ng.exe" in your Steam directory.')
         unable_to_find_message = tkinter.Message(root, justify=tkinter.CENTER, font='font 10', text=text, width=600)
         unable_to_find_message.grid(row=0, pady=10)
@@ -2468,7 +2470,9 @@ def main():
         navigate_button = tkinter.Button(root, font='font 12', text=text, command=set_custom_path)
         navigate_button.grid(row=2, pady=10)
 
-        example_message = tkinter.Message(root, justify=tkinter.LEFT, font='font 10', text='Example location:\nC:\Program Files (x86)\Steam\steamapps\common\The Binding of Isaac Rebirth\isaac-ng.exe', width=800)
+        text = get_text('Example location') + ':\n'
+        text += 'C:\Program Files (x86)\Steam\steamapps\common\The Binding of Isaac Rebirth\isaac-ng.exe'
+        example_message = tkinter.Message(root, justify=tkinter.LEFT, font='font 10', text=text, width=800)
         example_message.grid(row=3, padx=15, pady=10)
 
         # Show the GUI

@@ -127,6 +127,18 @@ text = {
         'en': 'Navigate to "isaac-ng.exe"',
         'fr': 'Naviguer vers "isaac-ng.exe"',
     },
+    'Example location': {
+        'en': 'Example location',
+        'fr': 'Exemple de location',
+    },
+    'Success': {
+        'en': 'Success',
+        'fr': 'Succés',
+    },
+    'You have successfully set': {
+        'en': 'You have successfully set your Isaac resources directory. Click OK to restart ',
+        'fr': 'Vous avez réussi à rediriger le programme vers le répertoire de ressources d\'Isaac. Cliquez sur OK pour redémarrer l\'',
+    },
 
     # Template
     '': {
