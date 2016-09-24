@@ -1,6 +1,6 @@
 # Jud6s Custom Rulesets
 
-You can find the documentation for the "Normal / Unseeded" ruleset on [the GitHub page for the Jud6s Mod](https://github.com/Zamiell/jud6s). Occasionally, other modified rulesets are used for racing:
+You can find the documentation for the "Normal / Unseeded" ruleset on [the webpage page for the Jud6s Mod](https://zamiell.github.io/jud6s/#mod-changes). Occasionally, other modified rulesets are used for racing:
 
 #### Extra Changes in the "Seeded" ruleset
 * All characters start with The Compass in addition to their other items.
