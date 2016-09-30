@@ -2162,13 +2162,13 @@ class MiscellaneousWindow():
         self.window.bind('5', lambda event: self.uninstall_all())
         row += 1
 
-        # "" button
+        # "Visit the website" button
         text = ' ' + get_text('Visit the website for') + ' ' + mod_pretty_name + ' (6) '
         website_button = tkinter.Button(self.window, text=text, compound='left')
         website_button.configure(font=('Helvetica', 13))
         website_button.configure(command=self.visit_website)
         website_button.grid(row=row, pady=5)
-        self.window.bind('5', lambda event: self.website_button.invoke())
+        self.window.bind('6', lambda event: website_button.invoke())
         row += 1
 
         # "Go Back" button

@@ -21,6 +21,7 @@ import subprocess          # For running the actual program
 import time                # For slowing down the spinning animation
 import threading           # For spawning a new thread to do the update work in (1/2)
 import queue               # For spawning a new thread to do the update work in (2/2)
+import base64              # For decoding the included D6 picture
 from PIL import Image, ImageTk  # For rotating the dice
 import platform               # For autodetecting the user's language (1/3)
 import locale                 # For autodetecting the user's language (2/3)

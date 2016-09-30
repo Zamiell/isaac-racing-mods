@@ -3,6 +3,7 @@
 * *3.5.1* - September 30th
   * Added icons for the "Go Back" buttons.
   * Added various "About" buttons that link to documentation for the various mods.
+  * Added a "Visit the website" button to the "Miscellaneous Stuff" section.
 * *3.5.0* - September 19th
   * Isaac Racing Mods has been partially translated to French; just select "Français" from the main menu.
   * The keyboard hotkey for "Exit" on the main menu has been changed to Esc.
