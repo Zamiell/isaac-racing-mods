@@ -97,6 +97,10 @@ text = {
         'en': 'Uninstall all existing mods',
         'fr': 'Désinstaller tous les mods',
     },
+    'Visit the website for': {
+        'en': 'Visit the website for',
+        'fr': 'Visiter le site',
+    },
 
     # Miscellaneous
     'Isaac will open': {
@@ -110,6 +114,14 @@ text = {
     'Isaac will return to normal': {
         'en': 'Isaac will return to normal when this program is closed.',
         'fr': 'Isaac retournera à sa configuration d\'origine à la fermeture de ce programme.',
+    },
+    'About these options': {
+        'en': 'About these options',
+        'fr': 'A propos des options',
+    },
+    'About this mod': {
+        'en': 'About this mod',
+        'fr': 'A propos du mod',
     },
     'Go Back': {
         'en': 'Go Back',

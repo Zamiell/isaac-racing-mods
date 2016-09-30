@@ -581,13 +581,36 @@ class Jud6sWindow():
         self.window.bind('8', lambda event: ruleset8_button.invoke())
         row += 1
 
+        # Spacing
+        spacing = tkinter.Message(self.window, text='', font='font 6')
+        spacing.grid(row=row)
+        row += 1
+
+        # "About these options" button
+        text = ' ' + get_text('About these options') + ' (9) '
+        about_options_button = tkinter.Button(self.window, text=text, compound='left')
+        about_options_button.configure(font=('Helvetica', 13))
+        about_options_button.configure(command=self.about_options)
+        about_options_button.icon = ImageTk.PhotoImage(get_item_icon('???'))
+        about_options_button.configure(image=about_options_button.icon)
+        about_options_button.grid(row=row, pady=5)
+        self.window.bind('9', lambda event: about_options_button.invoke())
+        row += 1
+
         # "Go Back" button
         text = ' ' + get_text('Go Back') + ' (Esc) '
         go_back_button = tkinter.Button(self.window, text=text, compound='left')
         go_back_button.configure(font=('Helvetica', 13))
         go_back_button.configure(command=self.go_back)
-        go_back_button.grid(row=row, pady=25)
+        go_back_button.icon = ImageTk.PhotoImage(Image.open('images/icons/go-back.png'))
+        go_back_button.configure(image=go_back_button.icon)
+        go_back_button.grid(row=row, pady=5)
         self.window.bind('<Escape>', lambda event: go_back_button.invoke())
+        row += 1
+
+        # Spacing
+        spacing = tkinter.Message(self.window, text='', font='font 6')
+        spacing.grid(row=row)
         row += 1
 
         # Instructions
@@ -751,6 +774,9 @@ class Jud6sWindow():
         # We are finished, so launch Isaac
         launch_isaac()
 
+    def about_options(self):
+        webbrowser.open('https://github.com/Zamiell/isaac-racing-mods/blob/master/docs/jud6s-mod-custom-rulesets.md')
+
     def go_back(self):
         get_window_x_y(self)
         self.window.destroy()
@@ -847,13 +873,36 @@ class InstantStartWindow():
         self.window.bind('6', lambda event: mega_satan_checkbox.invoke())
         row += 1
 
+        # Spacing
+        m = tkinter.Message(self.window, text='', font='font 7')
+        m.grid(row=row)
+        row += 1
+
+        # "About these options" button
+        text = ' ' + get_text('About these options') + ' (7) '
+        about_options_button = tkinter.Button(self.window, text=text, compound='left')
+        about_options_button.configure(font=('Helvetica', 13))
+        about_options_button.configure(command=self.about_options)
+        about_options_button.icon = ImageTk.PhotoImage(get_item_icon('???'))
+        about_options_button.configure(image=about_options_button.icon)
+        about_options_button.grid(row=row, pady=5)
+        self.window.bind('7', lambda event: about_options_button.invoke())
+        row += 1
+
         # "Go Back" button
         text = ' ' + get_text('Go Back') + ' (Esc) '
         go_back_button = tkinter.Button(self.window, text=text, compound='left')
         go_back_button.configure(font=('Helvetica', 13))
+        go_back_button.icon = ImageTk.PhotoImage(Image.open('images/icons/go-back.png'))
+        go_back_button.configure(image=go_back_button.icon)
         go_back_button.configure(command=self.go_back)
-        go_back_button.grid(row=row, pady=25)
+        go_back_button.grid(row=row, pady=5)
         self.window.bind('<Escape>', lambda event: go_back_button.invoke())
+        row += 1
+
+        # Spacing
+        m = tkinter.Message(self.window, text='', font='font 7')
+        m.grid(row=row)
         row += 1
 
         # Instructions
@@ -1080,7 +1129,7 @@ class InstantStartWindow():
                 # Update the inner frame's width to fill the canvas
                 canvas.itemconfigure(interior_id, width=canvas.winfo_width())
 
-        # _on_mousewheel - Code taken from: http://stackoverflow.com/questions/17355902/python-tkinter-binding-mousewheel-to-scrollbar
+        # _on_mousewheel - Code taken from: https://stackoverflow.com/questions/17355902/python-tkinter-binding-mousewheel-to-scrollbar
         def _on_mousewheel(event):
             canvas.yview_scroll(int(-1 * (event.delta / 120)), 'units')
 
@@ -1113,7 +1162,7 @@ class InstantStartWindow():
         canvas.configure(scrollregion=canvas.bbox('all'), width=200, height=200)
         canvas.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=tkinter.TRUE)
 
-        # Scrolling code taken from: http://stackoverflow.com/questions/16188420/python-tkinter-scrollbar-for-frame
+        # Scrolling code taken from: https://stackoverflow.com/questions/16188420/python-tkinter-scrollbar-for-frame
         image_box = tkinter.LabelFrame(canvas, borderwidth=0)
         interior_id = canvas.create_window(0, 0, window=image_box, anchor=tkinter.NW)
         image_box.bind('<Configure>', _configure_interior)
@@ -1157,6 +1206,8 @@ class InstantStartWindow():
         text = ' ' + get_text('Go Back') + ' (Esc) '
         go_back_button = tkinter.Button(image_box, text=text, compound='left')
         go_back_button.configure(font=('Helvetica', 11))
+        go_back_button.icon = ImageTk.PhotoImage(Image.open('images/icons/go-back.png'))
+        go_back_button.configure(image=go_back_button.icon)
         go_back_button.configure(command=go_back)  # Goes to nested function, not class function
         go_back_button.grid(row=row, pady=15)
         row += 1
@@ -1664,6 +1715,9 @@ class InstantStartWindow():
         # Save the result directly to the appropriate place in the Isaac resources folder
         title_img.save(os.path.join(isaac_resources_directory, 'gfx/ui/main menu/titlemenu.png'))
 
+    def about_options(self):
+        webbrowser.open('https://github.com/Zamiell/isaac-racing-mods/blob/master/docs/instant-start-mod.md')
+
     def go_back(self):
         get_window_x_y(self)
         self.window.destroy()
@@ -1702,7 +1756,7 @@ class DiversityWindow():
         # "Enter seed" label
         text = get_text('Enter a seed') + ':'
         enter_seed_label = tkinter.Label(dmbox, text=text, font='font 14')
-        enter_seed_label.grid(row=row2, column=0, pady=10)
+        enter_seed_label.grid(row=row2, column=0, pady=10, padx=7, sticky=tkinter.W)
 
         # "New Random Seed" button
         new_random_seed_button = tkinter.Button(dmbox, font='font 12')
@@ -1752,13 +1806,35 @@ class DiversityWindow():
         start_diversity_mod_button.grid(row=row, pady=7, columnspan=2)
         row += 1
 
+        # Spacing
+        spacing = tkinter.Message(self.window, text='', font='font 6')
+        spacing.grid(row=row)
+        row += 1
+
+        # "About this mod" button
+        text = ' ' + get_text('About this mod') + ' '
+        about_options_button = tkinter.Button(self.window, text=text, compound='left')
+        about_options_button.configure(font=('Helvetica', 13))
+        about_options_button.configure(command=self.about_this_mod)
+        about_options_button.icon = ImageTk.PhotoImage(get_item_icon('???'))
+        about_options_button.configure(image=about_options_button.icon)
+        about_options_button.grid(row=row, pady=5)
+        row += 1
+
         # "Go Back" button
         text = ' ' + get_text('Go Back') + ' (Esc) '
         go_back_button = tkinter.Button(self.window, text=text, compound='left')
         go_back_button.configure(font=('Helvetica', 13))
+        go_back_button.icon = ImageTk.PhotoImage(Image.open('images/icons/go-back.png'))
+        go_back_button.configure(image=go_back_button.icon)
         go_back_button.configure(command=self.go_back)
-        go_back_button.grid(row=row, column=0, pady=25)
+        go_back_button.grid(row=row, column=0, pady=5)
         self.window.bind('<Escape>', lambda event: go_back_button.invoke())
+        row += 1
+
+        # Spacing
+        spacing = tkinter.Message(self.window, text='', font='font 6')
+        spacing.grid(row=row)
         row += 1
 
         # Instructions
@@ -1996,6 +2072,9 @@ class DiversityWindow():
         # We are finished, so launch Isaac
         launch_isaac()
 
+    def about_this_mod(self):
+        webbrowser.open('https://github.com/Zamiell/isaac-racing-mods/blob/master/docs/diversity-mod.md')
+
     def go_back(self):
         get_window_x_y(self)
         self.window.destroy()
@@ -2083,10 +2162,21 @@ class MiscellaneousWindow():
         self.window.bind('5', lambda event: self.uninstall_all())
         row += 1
 
+        # "" button
+        text = ' ' + get_text('Visit the website for') + ' ' + mod_pretty_name + ' (6) '
+        website_button = tkinter.Button(self.window, text=text, compound='left')
+        website_button.configure(font=('Helvetica', 13))
+        website_button.configure(command=self.visit_website)
+        website_button.grid(row=row, pady=5)
+        self.window.bind('5', lambda event: self.website_button.invoke())
+        row += 1
+
         # "Go Back" button
         text = ' ' + get_text('Go Back') + ' (Esc) '
         go_back_button = tkinter.Button(self.window, text=text, compound='left')
         go_back_button.configure(font=('Helvetica', 13))
+        go_back_button.icon = ImageTk.PhotoImage(Image.open('images/icons/go-back.png'))
+        go_back_button.configure(image=go_back_button.icon)
         go_back_button.configure(command=self.go_back)
         go_back_button.grid(row=row, pady=25)
         self.window.bind('<Escape>', lambda event: go_back_button.invoke())
@@ -2177,6 +2267,9 @@ class MiscellaneousWindow():
 
     def uninstall_all(self):
         purge_resources_directory(self)
+
+    def visit_website(self):
+        webbrowser.open('https://zamiell.github.io/isaac-racing-mods/')
 
     def go_back(self):
         get_window_x_y(self)
@@ -2442,7 +2535,7 @@ def main():
     if language != 'autodetect' and language != 'en' and language != 'fr':
         error('The "options.ini" value for "automatically_close_isaac" is not set to a valid language.', None)
     if language == 'autodetect':
-        # Find the user's locale, from: http://stackoverflow.com/questions/3425294/how-to-detect-the-os-default-language-in-python
+        # Find the user's locale, from: https://stackoverflow.com/questions/3425294/how-to-detect-the-os-default-language-in-python
         if platform.system() == 'Windows':
             lang_identifier = locale.windows_locale[ctypes.windll.kernel32.GetUserDefaultUILanguage()]
         else:

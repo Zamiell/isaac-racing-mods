@@ -5,7 +5,7 @@
 
 ## Download & Additional Information
 
-Please visit [the website for the Isaac Racing Mods](http://zamiell.github.io/isaac-racing-mods/).
+Please visit [the website for the Isaac Racing Mods](https://zamiell.github.io/isaac-racing-mods/).
 
 <br />
 

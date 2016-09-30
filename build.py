@@ -70,13 +70,13 @@ if os.path.exists('release'):
 if not os.path.isfile(pyinstaller_path):
     print('Error: Edit this file and specify the path to your pyinstaller.exe file.')
     exit(1)
-return_code = subprocess.call([pyinstaller_path, '--onefile', '--windowed', '--icon=images/the_d6.ico', mod_name + '.py'])
+return_code = subprocess.call([pyinstaller_path, '--onefile', '--windowed', '--icon=program/images/icons/the_d6.ico', mod_name + '.py'])
 if return_code != 0:
     error('Failed to freeze "' + mod_name + '.py".')
-return_code = subprocess.call([pyinstaller_path, '--onefile', '--windowed', '--icon=images/the_d6.ico', 'program/program.py'])
+return_code = subprocess.call([pyinstaller_path, '--onefile', '--windowed', '--icon=program/images/icons/the_d6.ico', 'program/program.py'])
 if return_code != 0:
     error('Failed to freeze "program.py".')
-return_code = subprocess.call([pyinstaller_path, '--onefile', '--windowed', '--icon=images/the_d6.ico', mod_name + '-standalone-updater.py'])
+return_code = subprocess.call([pyinstaller_path, '--onefile', '--windowed', '--icon=program/images/icons/the_d6.ico', mod_name + '-standalone-updater.py'])
 if return_code != 0:
     error('Failed to freeze "' + mod_name + '-standalone-updater.py".')
 
@@ -91,7 +91,7 @@ shutil.move('dist', install_directory)  # We use shutil.move() instead of os.ren
 # Copy over necessary files
 for file_name in ['options.ini', 'README.md', 'Shortcut to BoIA Resources Folder.lnk']:
     shutil.copy(file_name, os.path.join(install_directory, file_name))
-for directory_name in ['images', 'program']:
+for directory_name in ['program']:
     shutil.copytree(directory_name, os.path.join(install_directory, directory_name))
 
 # Remove "program.py"
