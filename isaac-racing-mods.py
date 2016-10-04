@@ -431,48 +431,64 @@ def close_mod(self):
 ###################################
 
 def get_text(text):
+    # Translations for the updater are not in a separate file for simplicity
     languages = {
         'A new version of': {
             'en': 'A new version of',
             'fr': 'Une version de',
+            'es': 'Una nueva versión de',
         },
         'has been released.': {
             'en': 'has been released.',
             'fr': 'est disponible.',
+            'es': 'está disponible',
         },
         'Version': {
             'en': 'Version',
             'fr': 'Version',
+            'es': 'Versión',
         },
         'You are currently running version': {
             'en': 'You are currently running version',
             'fr': 'Vous utilisez actuellement la version',
+            'es': 'Estás utilizando la versión',
         },
         'of': {
             'en': 'of',
             'fr': 'de',
+            'es': 'de',
         },
         'Automatically update and launch the new version': {
             'en': 'Automatically update and launch the new version',
             'fr': 'Mettre à jour automatiquement et lancer la nouvelle version',
+            'es': 'Actualizar automáticamente e iniciar la nueva versión',
         },
         'Launch the old version': {
             'en': 'Launch the old version',
             'fr': 'Lancer l\'ancienne version',
+            'es': 'Iniciar la versión antigua',
         },
         'Updating': {
             'en': 'Updating',
             'fr': 'Mise à jour',
+            'es': 'Actualizando',
         },
 
         # Template
         '': {
             'en': '',
             'fr': '',
+            'es': '',
         },
     }
-    return languages[text][language]
 
+    # Get the translated text
+    translated_text = languages[text][language]
+    if translated_text == '':
+        # There is no translation for this text snippet, so just display the English text
+        return text
+    else:
+        return translated_text
 
 
 ################
@@ -520,16 +536,21 @@ def main():
     window_x = int(mod_options['options']['window_x'])
     window_y = int(mod_options['options']['window_y'])
     language = mod_options['options']['language']
-    if language != 'autodetect' and language != 'en' and language != 'fr':
-        error('The "options.ini" value for "automatically_close_isaac" is not set to a valid language.', None)
+    if language != 'autodetect' and language != 'en' and language != 'fr' and language != 'es':
+        error('The "options.ini" value for "language" is not set to a valid language.', None)
     if language == 'autodetect':
         # Find the user's locale, from: https://stackoverflow.com/questions/3425294/how-to-detect-the-os-default-language-in-python
         if platform.system() == 'Windows':
             lang_identifier = locale.windows_locale[ctypes.windll.kernel32.GetUserDefaultUILanguage()]
         else:
             lang_identifier = locale.getdefaultlocale()[0]
-        if lang_identifier == 'fr_FR':
+
+        # lang_identifier will now be "en-US" or similar
+        # http://stackoverflow.com/questions/3191664/list-of-all-locales-and-their-short-codes
+        if lang_identifier[:2] == 'fr':
             language = 'fr'
+        elif lang_identifier[:2] == 'es':
+            language = 'es'
         else:
             # Default to English
             language = 'en'

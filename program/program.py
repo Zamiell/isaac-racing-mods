@@ -401,6 +401,14 @@ class ModSelectionWindow():
         self.language_fr_checkbox.grid(row=row)
         row += 1
 
+        # "Español" language checkbox
+        self.language_es = tkinter.IntVar()
+        if language == 'es':
+            self.language_es.set(1)
+        self.language_es_checkbox = tkinter.Checkbutton(self.window, text='Español', font='font 14', variable=self.language_es, command=self.set_language_es)
+        self.language_es_checkbox.grid(row=row)
+        row += 1
+
         # Spacing
         spacing = tkinter.Message(self.window, text='', font='font 6')
         spacing.grid(row=row)
@@ -431,33 +439,25 @@ class ModSelectionWindow():
         MiscellaneousWindow(self.parent)
 
     def set_language_en(self):
-        # Global variables
-        global mod_options
-        global language
-
-        # Write the new language to the INI file
-        mod_options.set('options', 'language', 'en')
-        try:
-            with open(os.path.join('..', 'options.ini'), 'w') as config_file:
-                mod_options.write(config_file)
-        except Exception as e:
-            error('Failed to write the new "language" value to the "options.ini" file:', e)
-
-        # Change the global variable for the language
-        language = 'en'
-
-        # Respawn the main menu
-        get_window_x_y(self)
-        self.window.destroy()
-        ModSelectionWindow(self.parent)
+        self.set_language('en')
 
     def set_language_fr(self):
+        self.set_language('fr')
+
+    def set_language_es(self):
+        self.set_language('es')
+
+    def set_language(self, new_language):
         # Global variables
         global mod_options
         global language
 
+        # Validate function arguments
+        if new_language != 'en' and new_language != 'fr' and new_language != 'es':
+            error('The "set_language" function was passed an invalid language value.')
+
         # Write the new language to the INI file
-        mod_options.set('options', 'language', 'fr')
+        mod_options.set('options', 'language', new_language)
         try:
             with open(os.path.join('..', 'options.ini'), 'w') as config_file:
                 mod_options.write(config_file)
@@ -465,7 +465,7 @@ class ModSelectionWindow():
             error('Failed to write the new "language" value to the "options.ini" file:', e)
 
         # Change the global variable for the language
-        language = 'fr'
+        language = new_language
 
         # Respawn the main menu
         get_window_x_y(self)
@@ -2459,7 +2459,13 @@ def purge_resources_directory(self):
 ###################################
 
 def get_text(text):
-    return languages.text[text][language]
+    # Get the translated text
+    translated_text = languages.text[text][language]
+    if translated_text == '':
+        # There is no translation for this text snippet, so just display the English text
+        return text
+    else:
+        return translated_text
 
 
 ################
@@ -2532,16 +2538,21 @@ def main():
     else:
         error('The "options.ini" value for "automatically_close_isaac" is not set to true or false.', None)
     language = mod_options['options']['language']
-    if language != 'autodetect' and language != 'en' and language != 'fr':
-        error('The "options.ini" value for "automatically_close_isaac" is not set to a valid language.', None)
+    if language != 'autodetect' and language != 'en' and language != 'fr' and language != 'es':
+        error('The "options.ini" value for "language" is not set to a valid language.', None)
     if language == 'autodetect':
         # Find the user's locale, from: https://stackoverflow.com/questions/3425294/how-to-detect-the-os-default-language-in-python
         if platform.system() == 'Windows':
             lang_identifier = locale.windows_locale[ctypes.windll.kernel32.GetUserDefaultUILanguage()]
         else:
             lang_identifier = locale.getdefaultlocale()[0]
-        if lang_identifier == 'fr_FR':
+
+        # lang_identifier will now be "en-US" or similar
+        # http://stackoverflow.com/questions/3191664/list-of-all-locales-and-their-short-codes
+        if lang_identifier[:2] == 'fr':
             language = 'fr'
+        elif lang_identifier[:2] == 'es':
+            language = 'es'
         else:
             # Default to English
             language = 'en'
