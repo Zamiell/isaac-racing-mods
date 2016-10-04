@@ -1,5 +1,8 @@
 # Version History
 
+* *3.5.2* - October 4th
+  * Isaac Racing Mods has been partially translated to Spanish; just select "Español" from the main menu.
+  * Fixed a bug with the automatic updater. You might have to download the new version manually if you recieve errors about a "d6_image". 
 * *3.5.1* - September 30th
   * Added icons for the "Go Back" buttons.
   * Added various "About" buttons that link to documentation for the various mods.

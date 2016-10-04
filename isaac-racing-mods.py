@@ -198,7 +198,7 @@ class NewVersion():
         self.canvas = tkinter.Canvas(self.window, width=100, height=100)
         self.canvas.pack()
         self.dice_angle = 0
-        self.window.iconbitmap(os.path.join(tempfile.gettempdir(), 'the_d6.ico'))  # Set the GUI icon
+        self.d6_image = Image.open(os.path.join(tempfile.gettempdir(), 'the_d6.ico'))
         self.rotated_d6 = ImageTk.PhotoImage(self.d6_image)
         self.d6 = self.canvas.create_image(50, 35, image=self.rotated_d6)
 
