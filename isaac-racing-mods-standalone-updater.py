@@ -46,7 +46,7 @@ def error(message, exception):
             message += traceback.format_exc()
 
     # Print the message to standard out
-    print(message)
+    print(message.encode('utf-8'))
 
     # Log the error to a file
     logging.error(message)
@@ -67,7 +67,7 @@ def warning(message, exception):
         message += traceback.format_exc()
 
     # Print the message to standard out
-    print(message)
+    print(message.encode('utf-8'))
 
     # Log the warning to a file
     logging.warning(message)
@@ -84,7 +84,7 @@ def callback_error(self, *args):
     message += traceback.format_exc()
 
     # Print the message to standard out
-    print(message)
+    print(message.encode('utf-8'))
 
     # Log the error to a file
     logging.error(message)

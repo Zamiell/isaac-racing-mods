@@ -50,7 +50,7 @@ def error(message, exception):
             message += traceback.format_exc()
 
     # Print the message to standard out
-    print(message)
+    print(message.encode('utf-8'))
 
     # Log the error to a file
     logging.error(message)
@@ -71,7 +71,7 @@ def warning(message, exception):
         message += traceback.format_exc()
 
     # Print the message to standard out
-    print(message)
+    print(message.encode('utf-8'))
 
     # Log the warning to a file
     logging.warning(message)
@@ -88,7 +88,7 @@ def callback_error(self, *args):
     message += traceback.format_exc()
 
     # Print the message to standard out
-    print(message)
+    print(message.encode('utf-8'))
 
     # Log the error to a file
     logging.error(message)
@@ -437,48 +437,57 @@ def get_text(text):
             'en': 'A new version of',
             'fr': 'Une version de',
             'es': 'Una nueva versión de',
+            'ru': 'Новая версия',
         },
         'has been released.': {
             'en': 'has been released.',
             'fr': 'est disponible.',
             'es': 'está disponible',
+            'ru': 'была выпущена.',
         },
         'Version': {
             'en': 'Version',
             'fr': 'Version',
             'es': 'Versión',
+            'ru': 'Версия',
         },
         'You are currently running version': {
             'en': 'You are currently running version',
             'fr': 'Vous utilisez actuellement la version',
             'es': 'Estás utilizando la versión',
+            'ru': 'Ты сейчас используешь версию',
         },
         'of': {
             'en': 'of',
             'fr': 'de',
             'es': 'de',
+            'ru': '',
         },
         'Automatically update and launch the new version': {
             'en': 'Automatically update and launch the new version',
             'fr': 'Mettre à jour automatiquement et lancer la nouvelle version',
             'es': 'Actualizar automáticamente e iniciar la nueva versión',
+            'ru': 'Автоматически обновить и запустить новую версию',
         },
         'Launch the old version': {
             'en': 'Launch the old version',
             'fr': 'Lancer l\'ancienne version',
             'es': 'Iniciar la versión antigua',
+            'ru': 'Запустить старую версию',
         },
         'Updating': {
             'en': 'Updating',
             'fr': 'Mise à jour',
             'es': 'Actualizando',
+            'ru': 'Обновление',
         },
-
+ 
         # Template
         '': {
             'en': '',
             'fr': '',
             'es': '',
+            'ru': '',
         },
     }
 
@@ -536,7 +545,12 @@ def main():
     window_x = int(mod_options['options']['window_x'])
     window_y = int(mod_options['options']['window_y'])
     language = mod_options['options']['language']
-    if language != 'autodetect' and language != 'en' and language != 'fr' and language != 'es':
+    if (language != 'autodetect' and
+        language != 'en' and
+        language != 'fr' and
+        language != 'es' and
+        language != 'ru'):
+
         error('The "options.ini" value for "language" is not set to a valid language.', None)
     if language == 'autodetect':
         # Find the user's locale, from: https://stackoverflow.com/questions/3425294/how-to-detect-the-os-default-language-in-python

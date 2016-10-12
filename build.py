@@ -29,6 +29,7 @@ mod_options.read('options.ini')
 mod_version = mod_options['options']['mod_version']
 
 # Make sure the options.ini file is set to the proper default values
+mod_options.set('options', 'isaac_resources_directory', 'C:/Program Files (x86)/Steam/SteamApps/common/The Binding of Isaac Rebirth/resources')
 mod_options.set('options', 'window_x', '50')
 mod_options.set('options', 'window_y', '50')
 mod_options.set('options', 'remove_boss_cutscenes', 'true')
@@ -51,8 +52,7 @@ with fileinput.FileInput(webpage_file, inplace=True) as file:
         else:
             print(line)
 if updated_link == False:
-    print('Failed to update the webpage.')
-    sys.exit(1)
+    error('Failed to update the webpage.')
 
 # Clean up build-related directories before we start to do anything
 if os.path.exists('build'):
@@ -66,19 +66,28 @@ if os.path.exists('program/__pycache__'):
 if os.path.exists('release'):
     shutil.rmtree('release')
 
-# Freeze the updater, the main program, and the standalone updater into an exe
+# Check if pyinstaller is installed
 if not os.path.isfile(pyinstaller_path):
     print('Error: Edit this file and specify the path to your pyinstaller.exe file.')
     exit(1)
-return_code = subprocess.call([pyinstaller_path, '--onefile', '--windowed', '--icon=program/images/icons/the_d6.ico', mod_name + '.py'])
+
+# Freeze the updater into an exe
+return_code = subprocess.call([pyinstaller_path, '--onefile', '--windowed', '--clean', '--log-level=ERROR', '--icon=program/images/icons/the_d6.ico', mod_name + '.py'])
 if return_code != 0:
     error('Failed to freeze "' + mod_name + '.py".')
-return_code = subprocess.call([pyinstaller_path, '--onefile', '--windowed', '--icon=program/images/icons/the_d6.ico', 'program/program.py'])
+print('Finished building. (1/3)')
+
+# Freeze the main program into an exe
+return_code = subprocess.call([pyinstaller_path, '--onefile', '--windowed', '--clean', '--log-level=ERROR','--icon=program/images/icons/the_d6.ico', 'program/program.py'])
 if return_code != 0:
     error('Failed to freeze "program.py".')
-return_code = subprocess.call([pyinstaller_path, '--onefile', '--windowed', '--icon=program/images/icons/the_d6.ico', mod_name + '-standalone-updater.py'])
+print('Finished building. (2/3)')
+
+# Freeze the standalone updater into an exe
+return_code = subprocess.call([pyinstaller_path, '--onefile', '--windowed', '--clean', '--log-level=ERROR','--icon=program/images/icons/the_d6.ico', mod_name + '-standalone-updater.py'])
 if return_code != 0:
     error('Failed to freeze "' + mod_name + '-standalone-updater.py".')
+print('Finished building. (3/3)')
 
 # Clean up
 shutil.rmtree('__pycache__')
@@ -124,3 +133,6 @@ shutil.rmtree('build')
 os.unlink(mod_name + '.spec')
 os.unlink('program.spec')
 os.unlink(mod_name + '-standalone-updater.spec')
+
+# Finished
+print('Built version ' + mod_version + ' successfully.')

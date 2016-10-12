@@ -1,5 +1,11 @@
 # Version History
 
+* *3.5.3* - October 11th
+  * Fixed the bug where the program would crash if you cancel out of the "isaac-ng.exe" selection box.
+  * The starting room graphic was slightly changed to make it look better. Thanks to Birdie0 for this.
+  * The "Lost Child Open" text on the Instant Start Mod is no longer translated to avoid confusion.
+  * Isaac Racing Mods has been partially translated to Russian; just select "Pусский" from the main menu.
+  * Thanks to SedNegi for the French translations, CrafterLynx for the Spanish translations, and Birdie0 and Dea1h for the Russian translations.
 * *3.5.2* - October 4th
   * Isaac Racing Mods has been partially translated to Spanish; just select "Español" from the main menu.
   * Fixed a bug with the automatic updater. You might have to download the new version manually if you recieve errors about a "d6_image". 

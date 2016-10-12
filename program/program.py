@@ -46,7 +46,7 @@ def error(message, exception):
         message += traceback.format_exc()
 
     # Print the message to standard out
-    print(message)
+    print(message.encode('utf-8'))
 
     # Log the error to a file
     logging.error(message)
@@ -68,7 +68,7 @@ def warning(message, exception):
         message += traceback.format_exc()
 
     # Print the message to standard out
-    print(message)
+    print(message.encode('utf-8'))
 
     # Log the warning to a file
     logging.warning(message)
@@ -86,7 +86,7 @@ def callback_error(self, *args):
     message += traceback.format_exc()
 
     # Print the message to standard out
-    print(message)
+    print(message.encode('utf-8'))
 
     # Log the error to a file
     logging.error(message)
@@ -409,6 +409,14 @@ class ModSelectionWindow():
         self.language_es_checkbox.grid(row=row)
         row += 1
 
+        # "Pусский" language checkbox
+        self.language_ru = tkinter.IntVar()
+        if language == 'ru':
+            self.language_ru.set(1)
+        self.language_ru_checkbox = tkinter.Checkbutton(self.window, text='Pусский', font='font 14', variable=self.language_ru, command=self.set_language_ru)
+        self.language_ru_checkbox.grid(row=row)
+        row += 1
+
         # Spacing
         spacing = tkinter.Message(self.window, text='', font='font 6')
         spacing.grid(row=row)
@@ -447,13 +455,20 @@ class ModSelectionWindow():
     def set_language_es(self):
         self.set_language('es')
 
+    def set_language_ru(self):
+        self.set_language('ru')
+
     def set_language(self, new_language):
         # Global variables
         global mod_options
         global language
 
         # Validate function arguments
-        if new_language != 'en' and new_language != 'fr' and new_language != 'es':
+        if (new_language != 'en' and
+            new_language != 'fr' and
+            new_language != 'es' and
+            new_language != 'ru'):
+
             error('The "set_language" function was passed an invalid language value.')
 
         # Write the new language to the INI file
@@ -812,9 +827,7 @@ class InstantStartWindow():
         row += 1
 
         # Button width
-        if language == 'en':
-            button_width = 250
-        elif language == 'fr':
+        if language == 'fr' or language == 'ru':
             button_width = 300
         else:
             button_width = 250
@@ -860,8 +873,7 @@ class InstantStartWindow():
 
         # LCO checkbox
         self.LCO_mode = tkinter.IntVar()
-        text = get_text('Lost Child Open') + ' (5)'
-        LCO_checkbox = tkinter.Checkbutton(self.window, anchor=tkinter.E, text=text, font='font 14', variable=self.LCO_mode)
+        LCO_checkbox = tkinter.Checkbutton(self.window, anchor=tkinter.E, text='Lost Child Open (5)', font='font 14', variable=self.LCO_mode)
         LCO_checkbox.grid(row=row)
         self.window.bind('5', lambda event: LCO_checkbox.invoke())
         row += 1
@@ -2538,7 +2550,12 @@ def main():
     else:
         error('The "options.ini" value for "automatically_close_isaac" is not set to true or false.', None)
     language = mod_options['options']['language']
-    if language != 'autodetect' and language != 'en' and language != 'fr' and language != 'es':
+    if (language != 'autodetect' and
+        language != 'en' and
+        language != 'fr' and
+        language != 'es' and
+        language != 'ru'):
+
         error('The "options.ini" value for "language" is not set to a valid language.', None)
     if language == 'autodetect':
         # Find the user's locale, from: https://stackoverflow.com/questions/3425294/how-to-detect-the-os-default-language-in-python
@@ -2586,6 +2603,10 @@ def main():
         # Show the GUI
         root.deiconify()
         tkinter.mainloop()
+
+    # Exit if the user exited out of the dialog without selecting a directory
+    if not os.path.isdir(isaac_resources_directory):
+        sys.exit(1)
 
     # Check to see if we are inside a subdirectory of the resources folder
     if os.path.normpath(isaac_resources_directory).lower() in os.path.normpath(os.getcwd()).lower():

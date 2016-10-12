@@ -41,7 +41,7 @@ You can find the list of builds [here](https://github.com/Zamiell/isaac-racing-m
 * This introduces the extra changes in [The Lost Child Open Loser's Bracket Jud6s ruleset](https://github.com/Zamiell/isaac-racing-mods/blob/master/docs/jud6s-mod-custom-rulesets.md).
 
 #### Mega Satan
-* This introduces the extra changes in [Mega Satan Jud6s] ruleset(https://github.com/Zamiell/isaac-racing-mods/blob/master/docs/jud6s-mod-custom-rulesets.md).
+* This introduces the extra changes in [Mega Satan Jud6s ruleset](https://github.com/Zamiell/isaac-racing-mods/blob/master/docs/jud6s-mod-custom-rulesets.md).
 
 <br />
 
