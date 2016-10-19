@@ -1,5 +1,8 @@
 # Version History
 
+* *3.5.4* - October 18th
+  * Language autodetection will now work with Russian.
+  * Lilith now starts with the D6.
 * *3.5.3* - October 11th
   * Fixed the bug where the program would crash if you cancel out of the "isaac-ng.exe" selection box.
   * The starting room graphic was slightly changed to make it look better. Thanks to Birdie0 for this.

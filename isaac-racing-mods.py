@@ -565,6 +565,8 @@ def main():
             language = 'fr'
         elif lang_identifier[:2] == 'es':
             language = 'es'
+        elif lang_identifier[:2] == 'ru':
+            language = 'ru'
         else:
             # Default to English
             language = 'en'
