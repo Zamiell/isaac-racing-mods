@@ -1,5 +1,7 @@
 # Version History
 
+* *3.5.5* - November 17th
+  * Fixed the 2x2 Blind Creep low-range softlock room in the Depths and Necropolis. Thanks to Hikarichan for reporting this.
 * *3.5.4* - October 18th
   * Language autodetection will now work with Russian.
   * Lilith now starts with the D6.
