@@ -3,6 +3,8 @@
 
 <br /><br />
 
+**Isaac Racing Mods is now renamed to the Racing+ mod. You can find more information about it at [the official website](https://isaacracing.net).**
+
 ## Download & Additional Information
 
 Please visit [the website for the Isaac Racing Mods](https://zamiell.github.io/isaac-racing-mods/).
