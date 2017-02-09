@@ -95,7 +95,7 @@ shutil.rmtree('program/__pycache__')
 
 # Rename the "dist" directory to the name of the mod and move it to the "release" folder
 install_directory = os.path.join('release', mod_name)
-shutil.move('dist', install_directory)  # We use shutil.move() instead of os.rename() because it will create the intermediary directories
+shutil.move('dist', install_directory)  # We use shutil.move() instead of os.rename() because it will create the intermediary directory
 
 # Copy over necessary files
 for file_name in ['options.ini', 'README.md', 'Shortcut to BoIA Resources Folder.lnk']:

@@ -1,5 +1,7 @@
 # Version History
 
+**Isaac Racing Mods is now renamed to the Racing+ mod. You can find more information about it at [the official website](https://isaacracing.net).**
+
 * *3.5.6* - November 18th
   * Set shields to the highest priority, which should fix the issue with Azazel from the last patch.
 * *3.5.6* - November 18th
